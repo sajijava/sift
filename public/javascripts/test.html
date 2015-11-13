@@ -1,0 +1,43 @@
+<style>
+	.thumbnail { height: 280px !important; }
+	.btn-droppable { width: 180px; height: 200px; padding-left: 4px; background-color: #f00; }
+	.btn-draggable {}
+</style>
+{{dragList}}
+{{dropList}}
+<div>
+	<div class="btn btn-droppable"
+			 data-drop="true"
+			 ng-model='dragList'
+			 data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=dragList])'}"
+			 jqyoui-droppable="{multiple:true}">
+		
+		
+		<div class="btn btn-info btn-draggable"
+				ng-repeat="item in dragList"
+				 data-drag="true"
+				 data-jqyoui-options="{revert: 'invalid'}"
+				 ng-model="dragList"
+				 jqyoui-draggable="{index: {{$index}},placeholder:true,animate:true}"
+				 ng-hide="false">{{item}}</div>
+	</div>
+	
+	<div class="thumbnail"
+			 data-drop="true"
+			 ng-model='dropList'
+			 data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=dropList])'}"
+			 jqyoui-droppable="{multiple:true}">
+		
+		<div class="caption " layout="row">
+			<div class="btn btn-info btn-draggable " flow="auto"
+					 ng-repeat="item in dropList"
+					 ng-show="item"
+					 data-drag="true"
+					 data-jqyoui-options="{revert: 'invalid'}"
+					 ng-model="dropList"
+					 jqyoui-draggable="{index: {{$index}},animate:true}">{{item}}</div>
+		</div>
+	</div>
+		
+
+</div>

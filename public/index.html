@@ -1,0 +1,53 @@
+<!doctype html>
+
+<html lang="en" ng-app="app.sift">
+<head>
+    <title><!-- Insert your title here --></title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Libraries From CDN -->
+		<script src="/node/jquery/dist/jquery.js"></script>
+		<script src="/javascripts/vendor/jquery-ui-1.11.4.custom/jquery-ui.js"></script>
+    <script src="javascripts/angular.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-resource.min.js">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-route.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-animate.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular-aria.min.js"></script>
+		
+    <!-- Angular Material Javascript now available via Google CDN, version 0.10 used here -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.11.2/angular-material.min.js"></script>
+    
+		<script src="/node/angular-ui-grid/ui-grid.js"></script>
+		<script src="/node/angular-dragdrop/src/angular-dragdrop.js"></script>
+		
+
+    <!-- Libraries from Local -->
+		<script src="/javascripts/dashboard/dashboard.js"></script>
+		<script src="/javascripts/screener/screener.js"></script>
+		<script src="/javascripts/watch/watch.js"></script>
+		<script src="/javascripts/aewatchlist/aewatchlist.js"></script>
+		<script src="/javascripts/test.js"></script>
+    <script src="/javascripts/route.js"></script>
+		
+		
+    <!-- CSS from CDN-->
+		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.11.2/angular-material.min.css">
+		<link rel="stylesheet" href="/node/angular-ui-grid/ui-grid.css">
+
+    <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.css"-->
+     
+    <!--CSS from Local-->
+		<link href="stylesheets/sift.css" rel="stylesheet" media="screen">   
+        
+
+</head>
+<body >
+    <div class="container-fluid">
+        <div ng-view></div>
+    </div>
+        
+</body>
+</html>

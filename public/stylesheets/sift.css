@@ -1,0 +1,74 @@
+body {
+  padding: 5px;
+  font: 12px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+div {
+  border : 1px solid #000;
+}
+table {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 0px;
+    border-color: grey;
+}
+
+
+.w-grid table{
+  border-spacing: none;
+  border-collapse: collapse;
+  margin-top:1px;
+}
+.w-grid-tab{
+  /*padding-top:3px;*/
+  
+  
+}
+.w-grid-tab>thead{
+  background-color: #aaaaaa;
+  font-weight: bold;
+  
+  
+}
+.w-grid-tab thead tr td{
+  /*border-right: 1px solid #fff;*/
+  padding-left: 3px;
+  
+}
+.w-grid-tab  tr td{
+  border: 1px solid #bbb;
+  
+}
+.w-grid-tab .remove-btn{
+  font-weight: bold;
+  color: #f00;
+  cursor: pointer;
+
+}
+.w-grid-tab tbody tr:nth-child(even){
+  background-color: #eee;
+}
+.w-grid-tab tbody tr:hover{
+  background-color: #ff984f;
+}
+
+.positive-ratio{
+  color:green;
+}
+.negative-ratio{
+  color:red;
+}
+
+.align-center{
+  text-align: center;
+}
+.align-left{
+  text-align: left;
+}
+.align-right{
+  text-align: right;
+}

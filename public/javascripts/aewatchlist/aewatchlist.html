@@ -1,0 +1,62 @@
+<style>
+	.thumbnail { height: 280px !important; background-color: #0f0; width: 100%}
+.btn-droppable { width: 100%; height: 160px; padding-left: 4px;  background-color: #f00;}
+.btn-draggable 	{}
+</style>
+{{aeWatchlistForm}}
+<div layout="row">
+	<div flex="50">
+		<md-content layout-padding>
+				<md-input-container class="md-block">
+					<label>Name</label>
+					<input  required name="Name" ng-model="aeWatchlistForm.name">
+				</md-input-container>
+				<md-input-container class="md-block">
+					<label>Description</label>
+					<input  required name="description" ng-model="aeWatchlistForm.desc">
+				</md-input-container>
+		</md-content>
+		
+		<div layout="row">
+			
+					<div flex="20">
+						<div class="btn btn-droppable"
+								 data-drop="true"
+								 ng-model='sourceFields'
+								 data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=sourceFields])'}"
+								 jqyoui-droppable="{multiple:true}">
+							
+							
+							<div class="btn btn-info btn-draggable"
+									ng-repeat="item in sourceFields"
+									 data-drag="true"
+									 data-jqyoui-options="{revert: 'invalid'}"
+									 ng-model="sourceFields"
+									 jqyoui-draggable="{index: {{$index}},placeholder:true,animate:true,onDrag:'dragCallback'}"
+									 ng-hide="!item.desc">{{item.desc}}</div>
+						</div>
+						
+					</div>	
+
+					<div class="thumbnail"
+							data-drop="true"
+							ng-model='aeWatchlistForm.table'
+							data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=aeWatchlistForm.table])'}"
+							jqyoui-droppable="{multiple:true, onDrop:'dropCallback($index)'}">
+					 
+						 <div layout="row" layout-align="start start">
+							 <div class="btn btn-info btn-draggable " flow="auto"
+									ng-repeat="item in aeWatchlistForm.table"
+									ng-show="true"
+									data-drag="true"
+									data-jqyoui-options="{revert: 'invalid'}"
+									ng-model="aeWatchlistForm.table"
+									jqyoui-draggable="{index: {{$index}},animate:true}">{{item.desc}}</div>
+						 </div>
+				 </div>
+		</div>
+				
+	
+		
+	</div>
+</div>
