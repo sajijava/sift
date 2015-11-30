@@ -1,43 +1,27 @@
 <style>
-	.thumbnail { height: 280px !important; }
-	.btn-droppable { width: 180px; height: 200px; padding-left: 4px; background-color: #f00; }
-	.btn-draggable {}
+	.bin {
+  min-height: 150px;
+  min-width: 150px;
+  float: left;
+  border: 1px solid red;
+  padding: 20px;
+}
+.item {
+  min-height: 150px;
+  min-width: 150px;
+  background: blue;
+  float: right;
+}
+.drag {
+  opacity: 0.5;
+}
+.over {
+  background: red;
+}
 </style>
-{{dragList}}
-{{dropList}}
-<div>
-	<div class="btn btn-droppable"
-			 data-drop="true"
-			 ng-model='dragList'
-			 data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=dragList])'}"
-			 jqyoui-droppable="{multiple:true}">
-		
-		
-		<div class="btn btn-info btn-draggable"
-				ng-repeat="item in dragList"
-				 data-drag="true"
-				 data-jqyoui-options="{revert: 'invalid'}"
-				 ng-model="dragList"
-				 jqyoui-draggable="{index: {{$index}},placeholder:true,animate:true}"
-				 ng-hide="false">{{item}}</div>
-	</div>
+<div ng-controller="testCtrl">
+<div class="bin" droppable  ng-repeat="bin in [1,2,3]" id="bin{{bin}}">{{bin}}</div>
+<div class="item" id="item{{item}}" draggable ng-repeat="item in [1,2,3,4]">{{item}}</div>
 	
-	<div class="thumbnail"
-			 data-drop="true"
-			 ng-model='dropList'
-			 data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=dropList])'}"
-			 jqyoui-droppable="{multiple:true}">
-		
-		<div class="caption " layout="row">
-			<div class="btn btn-info btn-draggable " flow="auto"
-					 ng-repeat="item in dropList"
-					 ng-show="item"
-					 data-drag="true"
-					 data-jqyoui-options="{revert: 'invalid'}"
-					 ng-model="dropList"
-					 jqyoui-draggable="{index: {{$index}},animate:true}">{{item}}</div>
-		</div>
-	</div>
-		
-
+</div>
 </div>

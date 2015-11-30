@@ -1,10 +1,10 @@
 
 var fieldSrc = require('./fieldSource');
 var dao = require('./watcherDAO');
-var yahooFinance = require('yahoo-finance');
+var findataDAO = require('./findataDAO');
 var Promise = require('bluebird');
 var _ = require('lodash');
-var math = require('mathjs')
+
 
 
 // list of all the watchers  names that are available
@@ -35,19 +35,23 @@ var getWatcherData = function(req, res){
 				resolve(getSymbols(currentTemplate.data))
 		}).then(function(symbols){ // get Quote data from Yahoo
 				console.log("first then");
-				console.log(symbols);
+				//console.log(symbols);
 				var src = dao.getCurrentTemplate(id).sourceFlds
-				return getDataFromYahoo(symbols,src)
+				return findataDAO.getDataFromYahoo(symbols,src)
 
 		}).then(function(snapshot){ //relabel yahoo data
 				console.log("Third then");
+				// get all source field from template e.g. close: {},
 				var src = dao.getCurrentTemplate(id).sourceFlds
-				var attributes = getYahooKeys(src)
-				return mapQuoteSnapShot(snapshot,attributes);
+				//console.log(src);
+				var attributes = findataDAO.getYahooKeys(src)
+				//console.log(attributes);
+				console.log(snapshot);
+				return findataDAO.mapQuoteSnapShot(snapshot,attributes);
 
 		}).then(function(sourceData){
 				console.log("Third then");
-				console.log(sourceData);
+		//		console.log(sourceData);
 				var table = [];
 				var currentTemplate = dao.getCurrentTemplateData(id);
 				var template = dao.getCurrentTemplate(id).template;
@@ -55,9 +59,9 @@ var getWatcherData = function(req, res){
 				for (idx in currentTemplate.data) {
 						//console.log("watcher " +watcher)
 						var data = currentTemplate.data[idx];
-						mergeMap(data, sourceData);
-						//console.log(data);
-						var row = createRow(template,data,formatting)
+						findataDAO.mergeMap(data, sourceData);
+						console.log(data);
+						var row = findataDAO.createRow(template,data,formatting)
 						//console.log("**************");
 						//console.log(row);
 						table.push(row);		
@@ -67,19 +71,7 @@ var getWatcherData = function(req, res){
 		});
 }
 
-var mergeMap = function(map1, arrMap){
-	
-	var sourceMap = arrMap[map1.symbol];
 
-	for(k in sourceMap)
-	{
-		
-			//console.log(k);
-			//console.log(sourceMap[k]);
-			map1[k] = sourceMap[k];
-		
-	}
-}
 var getSymbols = function(data){
 	var symbols = [];
 	for (watcher in data) {
@@ -90,113 +82,8 @@ var getSymbols = function(data){
 	return symbols;
 }
 
-var createRow = function(template, data,formatting){
-
-	var row = _.clone(template,true);
-
-	//console.log(template);
-	for (item in row) {
-			
-		if (_.isUndefined(row[item].formula)) {
-				row[item]["data"] = data[row[item].name];
-		}else if (row[item].type == "D") {
-				
-		}else{
-				try{
-					var res = round(math.eval(row[item].formula, data));
-					row[item]["data"] = (isNaN(res))?0:res;
-					data[row[item].name] = row[item]["data"];
-				}catch(e)
-				{
-					row[item]["data"] = "";
-					console.error(e);	
-				}
-		}
-		
-		// apply column formatting
-		if (!_.isUndefined(formatting[row[item].name])) {
-			var conditions = formatting[row[item].name];
-			for(condIdx in conditions){
-				var result = math.eval(conditions[condIdx].cond, data);
-				if (result) {
-					row[item]["style"] = conditions[condIdx].style;
-				}
-			}
-		}
-		
-		if (_.isUndefined(row[item]["data"])) {
-			row[item]["data"] = "";
-		}
-	}
-	// apply row formatting
-	if (!_.isUndefined(formatting["row"])) {
-		var conditions = formatting["row"];
-		for(condIdx in conditions){
-			var result = math.eval(conditions[condIdx].cond, data);
-			if (result) {
-				row[0]["rowStyle"] = conditions[condIdx].style;
-			}
-		}
-	}
 
 
-	return row;	
-}
-var round = function(digit)
-{
-	return digit.toFixed(2);
-}
-var getDataFromYahoo = function(symbols, sourceFlds){
-	
-	//console.log(attributes);
-	// find attributed based on sourceFlds
-	var attributes = getYahooKeys(sourceFlds);
-	return yahooFinance.snapshot({
-		symbols: symbols,
-		fields: _.keys(attributes)  // ex: ['s', 'n', 'd1', 'l1', 'y', 'r']
-		}, function (err, snapshot) {
-
-			console.log(snapshot);			
-			
-			
-		});
-	
-	
-}
-
-var getYahooKeys = function(sourceFlds){
-	var attributes = {}
-	
-	for(src in sourceFlds){
-			if (!_.isUndefined(fieldSrc[src])) {
-				attributes[fieldSrc[src].attribute] = {"field":src,"value":0};
-			}
-		}
-
-	return attributes;
-}
-
-var mapQuoteSnapShot = function(snapshot,attributes){
-	var sourceData = {};
-			if (!_.isUndefined(snapshot) && _.isArray(snapshot)) {
-				for(idx in snapshot){
-					
-					var resp = snapshot[idx];
-					sourceData[resp.symbol] = {}
-					var key = _.keys(attributes)
-					for(id in key){
-						
-						var obj = attributes[key[id]].field;
-						var row = {};
-						
-						sourceData[resp.symbol][obj]  = resp[key[id]];
-					}
-					
-				}
-			}
-			return sourceData;
-	
-}
 var getAttributes = function(srcFlds){
 		var fields = [];
 		for(src in srcFlds){
@@ -210,39 +97,6 @@ var getAttributes = function(srcFlds){
 		
 }
 
-/*
-// gird for UI Grid is created from backend.
-var convertToUiGrid = function(table,headers){
-	var uiGridOptions = {}
-	uiGridOptions["enableSorting"] = true;
-	uiGridOptions["columnDefs"] = headers;
-	uiGridOptions["data"] = table
-	return uiGridOptions;
-}
-// UI Grid cell filters
-
-var getCellFilter = function(type)
-{
-	
-		var cellFilter = "";
-		switch(type){
-			case 'C':
-				cellFilter = "currencyFilter";
-				break;
-			case 'F':
-				cellFilter = "fractionFilter";
-				break;
-			case 'P':
-				cellFilter = "percentFilter";
-				break;
-			case 'D':
-				cellFilter = "date";
-				break;
-			
-		}
-		return cellFilter;
-}
-*/
 var addNewWatcherData = function(req, res){
 
 	var symbols = req.params.symbols;

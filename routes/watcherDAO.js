@@ -15,7 +15,7 @@ var watcherData = [];
 
 var loadData = function(){
 	watcherData = common.readAll(watcherDataFileName);
-	console.log(watcherData)
+	//console.log(watcherData)
 }
 
 // this shouldn be cached
@@ -37,7 +37,7 @@ loadTemplates = function(){
 									};
 	}
 	;
-	console.log(watcher);
+	//console.log(watcher);
 }
 
 var buildMetaData  = function(table){
@@ -56,6 +56,8 @@ var buildMetaData  = function(table){
 	
 	for(key in table){
 		var row = table[key];
+
+
 		var cellFilter = "";//getCellFilter(row.type);
 		//console.log(cellFilter);
 		// column headers
@@ -148,3 +150,4 @@ exports.getCurrentTemplate = getCurrentTemplate;
 exports.getAllTemplates = getAllTemplates
 exports.updateWatcherData = updateWatcherData
 exports.removeFromWatcherData = removeFromWatcherData;
+exports.buildMetaData = buildMetaData;
