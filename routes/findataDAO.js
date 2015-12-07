@@ -8,7 +8,8 @@ var getDataFromYahoo = function(symbols, sourceFlds){
 	//console.log(attributes);
 	// find attributed based on sourceFlds
 	var attributes = getYahooKeys(sourceFlds);
-	//console.log(sourceFlds);
+	console.log(sourceFlds);
+	console.log(attributes);
 	return yahooFinance.snapshot({
 		symbols: symbols,
 		fields: _.keys(attributes)  // ex: ['s', 'n', 'd1', 'l1', 'y', 'r']

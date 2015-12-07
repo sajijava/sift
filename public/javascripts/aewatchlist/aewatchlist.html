@@ -23,17 +23,24 @@
 <div layout="row">
 		
 	<div flex="20">
-		<div   layout="column" >
+		<div   layout="column" droppable drop="removeColumn">
 			<div ng-repeat="item in sourceFields"  draggable index="{{$index}}" ng-show="item.show">{{item.desc}}</div>
 		</div>
 	</div>	
 
-	<div class="thumbnail" droppable drop="dropCallback" layout="row">
+	<div>
+		<a ng-click="addInputField()">Add Input Field</a>
+		<a ng-click="">Add a Formula</a>
+	</div>	
+	<div class="thumbnail" droppable drop="addColumn" layout="row">
 		<div id="viewGrid" class="w-grid">
 			<table class="w-grid-tab" border="0">
 				<thead>
 					<tr>
-						<td ng-repeat="col in header">{{col}}</td>
+						<td><div>Symbol</div></td>
+						<td ng-repeat="col in header">
+								<div draggable index="{{col.name}}">{{col.header}}</div>
+						</td>
 					</tr>
 				</thead>
 				<tbody></tbody>
@@ -51,4 +58,9 @@
 			</table>
 		</div>
 	</div>
+</div>
+<div>
+	<button ng-click="save()">Save</button>
+	<button ng-click="cancel()">Clear</button>
+	<span ng-show="saved">Successfully saved....</span>
 </div>

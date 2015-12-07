@@ -1,37 +1,300 @@
-[{"id":"001"
-									 ,"name":"BiotechBelow$1"
-									 ,"table":[
-														 {"header":"Symbol","name":"symbol","order":0,"source":"I", "size":6},
-														 {"header":"Entry Dt","name":"entryDate","order":1,"source":"I", "type":"D", "size":10},
-														 {"header":"Elapse Day","name":"elapseDt","formula":"Date - entryDate","order":2, "type":"D", "size":4},
-														 {"header":"Initial Price","name":"initPrice","order":3, "source":"I", "type":"C","size":7,"align":"R"},
-														 {"header":"Current Price","name":"close","order":4, "type":"C", "size":7,"align":"R"},
-														 {"header":"Diff","name":"diff","formula":"close - initPrice","order":5, "type":"F","size":7,"align":"R"},
-														 {"header":"Diff %","name":"diffPer","formula":"((close - initPrice) / initPrice) * 100","order":6, "type":"P","size":7,"align":"R"},
-														 {"header":"Beta","name":"beta","order":7,"size":7,"align":"R"},
-														 {"header":"Avg Vol","name":"avgVolume","order":8,"size":12,"align":"R"},
-														 {"header":"Volume","name":"volume","order":9,"size":12,"align":"R"},
-														 {"header":"Vol%","name":"volumePer","formula":"(volume/avgVolume) * 100","order":10, "type":"P","size":7,"align":"R"},
-														 {"header":"Shares Out", "name":"shares","order":11,"size":12,"align":"R","source":"I"},
-														 {"header":"Short % float","name":"shortRatio","order":12, "type":"P","size":7,"align":"R"},
-														 {"header":"Most Recent Qtr","name":"recentQtr","order":13,"size":7,"source":"I"},
-														 {"header":"Burn Qrt","name":"burnQrt","order":14, "type":"C","size":7,"align":"R","source":"I"},
-														 {"header":"Burn Ratio (mnth)","name":"burnPerMnth","formula":"burnQrt/3","order":15, "type":"C","size":7,"align":"R"},
-														 {"header":"Avail Cash","name":"cash","order":16, "type":"C","size":12,"align":"R","source":"I"},
-														 {"header":"Opt Coverage","name":"operCover","formula":"cash/burnPerMnth","order":17, "type":"F","size":7,"align":"R"},
-														 {"header":"Burn % Cash","name":"burnPerCash","formula":"abs(burnPerMnth/cash) * 100","order":18, "type":"P","size":7,"align":"R"},
-														 {"header":"Cash/share (CPS)","name":"cashPerShare","formula":"cash/shares","order":19, "type":"C","size":7,"align":"R"},
-														 {"header":"Price/ CPS","name":"priceIncCPS","formula":"(close/(cashPerShare))*100","order":20, "type":"P","size":7,"align":"R"}
-														]
-									 ,"formatting":{"diffPer":[
-																						 {"cond":"diffPer > 0", "style":"color:green;"},
-																						 {"cond":"diffPer < 0", "style":"color:red;"}
-																						 ],
-																	"operCover":[
-																					{"cond":"abs(operCover) < 10","style":"background-color:#8a8587"}
-																	],
-																	"row":[
-																					{"cond":"close < cashPerShare","style":"background-color:#c2dde5"}
-																	]
-																}
-									 }]
+[
+ {
+  "id": "1",
+  "name": "BiotechBelow$1",
+  "table": [
+   {
+    "header": "Symbol",
+    "name": "symbol",
+    "order": 0,
+    "source": "I",
+    "size": 6
+   },
+   {
+    "header": "Entry Dt",
+    "name": "entryDate",
+    "order": 1,
+    "source": "I",
+    "type": "D",
+    "size": 10
+   },
+   {
+    "header": "Elapse Day",
+    "name": "elapseDt",
+    "formula": "Date - entryDate",
+    "order": 2,
+    "type": "D",
+    "size": 4
+   },
+   {
+    "header": "Initial Price",
+    "name": "initPrice",
+    "order": 3,
+    "source": "I",
+    "type": "C",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Current Price",
+    "name": "close",
+    "order": 4,
+    "type": "C",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Diff",
+    "name": "diff",
+    "formula": "close - initPrice",
+    "order": 5,
+    "type": "F",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Diff %",
+    "name": "diffPer",
+    "formula": "((close - initPrice) / initPrice) * 100",
+    "order": 6,
+    "type": "P",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Beta",
+    "name": "beta",
+    "order": 7,
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Avg Vol",
+    "name": "avgVolume",
+    "order": 8,
+    "size": 12,
+    "align": "R"
+   },
+   {
+    "header": "Volume",
+    "name": "volume",
+    "order": 9,
+    "size": 12,
+    "align": "R"
+   },
+   {
+    "header": "Vol%",
+    "name": "volumePer",
+    "formula": "(volume/avgVolume) * 100",
+    "order": 10,
+    "type": "P",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Shares Out",
+    "name": "shares",
+    "order": 11,
+    "size": 12,
+    "align": "R",
+    "source": "I"
+   },
+   {
+    "header": "Short % float",
+    "name": "shortRatio",
+    "order": 12,
+    "type": "P",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Most Recent Qtr",
+    "name": "recentQtr",
+    "order": 13,
+    "size": 7,
+    "source": "I"
+   },
+   {
+    "header": "Burn Qrt",
+    "name": "burnQrt",
+    "order": 14,
+    "type": "C",
+    "size": 7,
+    "align": "R",
+    "source": "I"
+   },
+   {
+    "header": "Burn Ratio (mnth)",
+    "name": "burnPerMnth",
+    "formula": "burnQrt/3",
+    "order": 15,
+    "type": "C",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Avail Cash",
+    "name": "cash",
+    "order": 16,
+    "type": "C",
+    "size": 12,
+    "align": "R",
+    "source": "I"
+   },
+   {
+    "header": "Opt Coverage",
+    "name": "operCover",
+    "formula": "cash/burnPerMnth",
+    "order": 17,
+    "type": "F",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Burn % Cash",
+    "name": "burnPerCash",
+    "formula": "abs(burnPerMnth/cash) * 100",
+    "order": 18,
+    "type": "P",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Cash/share (CPS)",
+    "name": "cashPerShare",
+    "formula": "cash/shares",
+    "order": 19,
+    "type": "C",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Price/ CPS",
+    "name": "priceIncCPS",
+    "formula": "(close/(cashPerShare))*100",
+    "order": 20,
+    "type": "P",
+    "size": 7,
+    "align": "R"
+   }
+  ],
+  "formatting": {
+   "diffPer": [
+    {
+     "cond": "diffPer > 0",
+     "style": "color:green;"
+    },
+    {
+     "cond": "diffPer < 0",
+     "style": "color:red;"
+    }
+   ],
+   "operCover": [
+    {
+     "cond": "abs(operCover) < 10",
+     "style": "background-color:#8a8587"
+    }
+   ],
+   "row": [
+    {
+     "cond": "close < cashPerShare",
+     "style": "background-color:#c2dde5"
+    }
+   ]
+  }
+ },
+ {
+  "id": 2,
+  "name": "New",
+  "table": [
+   {
+    "header": "Symbol",
+    "name": "symbol",
+    "order": 0,
+    "source": "",
+    "size": 6
+   },
+   {
+    "header": "Ask",
+    "name": "ask",
+    "order": 1,
+    "type": "C",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Change",
+    "name": "change",
+    "order": 2,
+    "type": "C",
+    "size": 7,
+    "align": "R"
+   },
+   {
+    "header": "Volume",
+    "name": "volume",
+    "order": 4,
+    "type": "I",
+    "size": 11,
+    "align": "R"
+   },
+   {
+    "header": "Dividend Per Share",
+    "name": "divPerShare",
+    "order": 5,
+    "type": "C",
+    "size": 7,
+    "align": "R"
+   }
+  ],
+  "formatting": {},
+  "desc": "What New"
+ },
+ {
+  "id": 3,
+  "name": "",
+  "table": [
+   {
+    "header": "Symbol",
+    "name": "symbol",
+    "order": 0,
+    "source": "",
+    "size": 6
+   },
+   {
+    "header": "Peee",
+    "name": "PPPP",
+    "order": 99,
+    "type": "I",
+    "size": "8",
+    "source": "I",
+    "align": "R"
+   }
+  ],
+  "formatting": {}
+ },
+ {
+  "id": 4,
+  "name": "Test",
+  "table": [
+   {
+    "header": "Symbol",
+    "name": "symbol",
+    "order": 0,
+    "source": "",
+    "size": 6
+   },
+   {
+    "header": "uejjehj",
+    "name": "OOOO",
+    "order": 99,
+    "type": "kjksj",
+    "size": "299",
+    "source": "I",
+    "align": "R"
+   }
+  ],
+  "formatting": {},
+  "desc": "New"
+ }
+]

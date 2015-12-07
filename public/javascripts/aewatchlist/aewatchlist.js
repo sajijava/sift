@@ -1,11 +1,12 @@
-var aewatchlist = angular.module('app.sift.aeWatchlist', ['ui.grid','ngDragDrop']);
+var aewatchlist = angular.module('app.sift.aeWatchlist', ['ui.grid','ngDragDrop','ngRoute','ngMaterial']);
 
-aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDialog','$routeParams',
-																					function($scope,aeWatchlistService,$mdDialog,$routeParams){
+aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDialog','$mdMedia','$routeParams','$route',
+																					function($scope,aeWatchlistService,$mdDialog,$mdMedia,$routeParams,$route){
 	$scope.aeWatchlistForm = {};
 	$scope.sourceFields = [];
 	$scope.sampleGrid = [];
 	$scope.header = [];
+	$scope.saved  = false;
 	
 	aeWatchlistService.getSourceFields()
 	.then(function(d){
@@ -15,13 +16,32 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
 		}
 	});
 	
-	aeWatchlistService.getTemplateObject()
-	.then(function(d){
-		$scope.aeWatchlistForm = d;
-	});
+
 	
 	
-	$scope.dropCallback = function(d) {
+	var initPage = function(){
+		
+			aeWatchlistService.getTemplateObject($routeParams.id)
+			.then(function(d){
+				$scope.aeWatchlistForm = d;
+				var templateColMap = {};
+				for(row in $scope.aeWatchlistForm.table){
+					templateColMap[$scope.aeWatchlistForm.table[row].name]={}
+				}
+				for(src in $scope.sourceFields){
+					if (templateColMap[$scope.sourceFields[src].name] !== undefined) {
+						$scope.sourceFields[src].show = false
+					}
+				}
+				
+				getData();
+			});
+
+	}
+	
+	initPage();
+	
+	$scope.addColumn = function(d) {
 		$scope.sourceFields[d].show = false;
 		
 		var src = $scope.sourceFields[d];
@@ -33,24 +53,42 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
 								"align":src.align};
 		
 		$scope.aeWatchlistForm.table.push(row);
-		
+		getData();		
+	};
+	
+	var getData = function(){
 		aeWatchlistService.getData($scope.aeWatchlistForm)
 		.then(function(d){
 			$scope.sampleGrid=d;
 			makeHeader();	
 		})
-	};
-	
+		
+	}
 	var makeHeader = function(){
 			$scope.header=[];
 			var first = $scope.sampleGrid[0];
 			for (col in first) {
-				$scope.header.push(first[col].header);
+				if (first[col].name != 'symbol') {
+					$scope.header.push({"header":first[col].header,"name":first[col].name});
+				}
 			}
 		}
-	$scope.dragCallback = function(event, ui) {
-   // console.log(ui);
-		//console.log(event);
+	$scope.removeColumn= function(d) {
+		
+		for(src in $scope.sourceFields){
+			if ($scope.sourceFields[src].name == d) {
+				$scope.sourceFields[src].show = true;
+				break;
+			}
+		}
+		
+		for(idx in $scope.aeWatchlistForm.table){
+			if ($scope.aeWatchlistForm.table[idx].name == d) {
+				$scope.aeWatchlistForm.table.splice(idx,1);
+				break;
+			}
+		}
+		getData();
 	};
 	
 	
@@ -66,7 +104,86 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
 			}
 			return align;
 		}
+		
+	$scope.save = function(){
+		aeWatchlistService.saveData($scope.aeWatchlistForm)
+		.then(function(d){
+			$scope.saved = d.success;
+		})
+	}
+	$scope.clear = function(){
+		$route.reload();
+		$window.refresh();
+	}
+	var addInputColumn = function(newColumn){
+		var align = "R";
+		if (newColumn.type == 'T') {
+			align = "L";
+		}
+		
+		var newCol = {"header":newColumn.desc,
+								"name":newColumn.name,
+								"order":99,
+								"type":newColumn.type,
+								"size":newColumn.size,
+								"source":"I",
+								"align":align};
+		
+		$scope.aeWatchlistForm.table.push(newCol);
+		getData();
+	}
+	
+	$scope.customFullscreen = $mdMedia('sm');
+	$scope.addInputField = function(ev){
+	 $mdDialog.show({
+      controller: addInputDialogController,
+      templateUrl: 'javascripts/aewatchlist/addinput.html',
+      parent: angular.element(document.body),
+      targetEvent: ev,
+      clickOutsideToClose:true,
+      fullscreen: $mdMedia('sm') && $scope.customFullscreen
+    })
+    .then(function(newInput) {
+			console.log(newInput);
+			addInputColumn(newInput);
+    }, function() {
+      $scope.status = 'You cancelled the dialog.';
+    });
+	};
+	var addInputDialogController = function($scope,$mdDialog){
+		$scope.newInput = {};
+		$scope.saveNewColumn = function(){
+			$mdDialog.hide($scope.newInput);
+		}
+	}
+	
+	$scope.addFormulaField = function(ev){
+	 $mdDialog.show({
+      controller: addFormulaDialogController,
+      templateUrl: 'javascripts/aewatchlist/addformula.html',
+      parent: angular.element(document.body),
+      targetEvent: ev,
+      clickOutsideToClose:true,
+      fullscreen: $mdMedia('sm') && $scope.customFullscreen
+    })
+    .then(function(newInput) {
+			console.log(newInput);
+			addInputColumn(newInput);
+    }, function() {
+      $scope.status = 'You cancelled the dialog.';
+    });
+	};
+	var addFormulaDialogController = function($scope,$mdDialog){
+		$scope.newInput = {};
+		$scope.saveNewColumn = function(){
+			$mdDialog.hide($scope.newInput);
+		}
+	}
+	
+	
+	
 }]);
+
 
 aewatchlist.factory('aeWatchlistService',['$http','$q',function($http,$q){
 	
@@ -84,7 +201,9 @@ aewatchlist.factory('aeWatchlistService',['$http','$q',function($http,$q){
 	return{
 			getSourceFields : function(){ return callHttp({method:'GET',url:urlPrefix+"/get/template/fieldlist"})},
 			getData : function(data){ return callHttp({method:'POST',url:urlPrefix+"/get/template/sampledata",data:data})},
-			getTemplateObject : function(){ return callHttp({method:'GET',url:urlPrefix+"/get/template/object"})}
+			getTemplateObject : function(id){ return callHttp({method:'GET',url:urlPrefix+"/get/template/object/"+id})},
+			
+			saveData : function(data){ return callHttp({method:'POST',url:urlPrefix+"/get/template/savetemplate",data:data})},
 			
 	}
 }]);
@@ -104,11 +223,13 @@ aewatchlist.directive('draggable',function(){
 				//item being dragged is to be moved when it's dropped,
 				e.dataTransfer.effectAllowed = 'move';
 				
-				console.log(scope.data);
+				//console.log(scope.data);
 				//Putting the id of the element into the dataTransfer data will mean
 				//that we can get the element when a drop event occurs
-				var dragData = scope.$eval(attrs.index);
-				e.dataTransfer.setData('d',dragData);
+				//var dragData = scope.$eval(attrs.index);
+				e.dataTransfer.setData('d',attrs.index);
+				
+				console.log("drag data "+attrs.index);
 				
 				this.classList.add('drag');
 				
@@ -196,3 +317,5 @@ aewatchlist.directive('droppable', function(){
 				}
 		}
 });
+
+

@@ -8,7 +8,7 @@ a {
 }
 
 div {
-  /*border : 1px solid #000;*/
+  border : 1px solid #000;
 }
 table {
     display: table;
@@ -71,4 +71,11 @@ table {
 }
 .align-right{
   text-align: right;
+}
+
+md-input-container{
+  border: 1px solid #aaa;
+  padding-bottom:4px;
+  border-radius: 5px;
+  margin-bottom: 5px;
 }

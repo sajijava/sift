@@ -3,7 +3,7 @@ var fieldSrc = require('./fieldSource');
 var dao = require('./watcherDAO');
 var Promise = require('bluebird');
 var findataDAO = require('./findataDAO');
-
+var _ = require('lodash');
 
 
 var getFieldSource = function(req, res){
@@ -18,11 +18,23 @@ var getFieldSource = function(req, res){
 	res.json(fieldList)
 }
 var getTemplateObject = function(req, res){
-	res.json( { "id":""
-		,"name":""
-		,"table":[{"header":"Symbol","name":"symbol","order":0,"source":"I", "size":6}]
-		,"formatting":{}
-	});
+
+	console.log(req.params);
+	var id = req.params.watcherid;
+	
+	console.log("get template for id "+id);
+	var template = {};
+	if (!_.isUndefined(id) && id != 'undefined' && _.trim(id).length > 0){
+		template = dao.getRawTemplate(id);
+	}else{
+		template = { "id":dao.getMaxTemplateId()+1
+									,"name":""
+									,"table":[{"header":"Symbol","name":"symbol","order":0,"source":"I", "size":6}]
+									,"formatting":{}
+								};
+	}
+	
+	res.json(template);
 }
 
 var getSampleData = function(req,res){
@@ -53,26 +65,33 @@ var getSampleData = function(req,res){
 						//console.log("watcher " +watcher)
 						var data = {"symbol":sampleSymbols[idx]};
 						findataDAO.mergeMap(data, sourceData);
-						console.log(data);
+		//				console.log(data);
 						var row = findataDAO.createRow(template.table,data,formatting)
 						//console.log("**************");
-						console.log(row);
+			//			console.log(row);
 						table.push(row);		
 					}
 					
-				console.log(table);	
+			//	console.log(table);	
 				res.json(table);				
 		});
 	
 }
 
+var saveTemplate = function(req, res){
+	console.log("prepare to save");
+	console.log(req.body);
+	dao.persistTemplate(req.body);
+	res.json({success:true});
+}
 exports.setRESTInterfaces = function(app){
 	
 	app.get('/api/get/template/fieldlist', getFieldSource);
-	app.get('/api/get/template/object',getTemplateObject);
+	app.get('/api/get/template/object/:watcherid',getTemplateObject);
 	
 	
 	app.post('/api/get/template/sampledata', getSampleData);
+	app.post('/api/get/template/savetemplate', saveTemplate);
 	
 	
 }

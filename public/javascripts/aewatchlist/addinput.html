@@ -1,0 +1,32 @@
+<md-dialog aria-label="Add New Field"  ng-cloak>
+		<md-toolbar>
+				<div class="md-toolbar-tools">
+					<h2>Add Input Column</h2>
+					<span flex></span>
+					<md-button class="md-icon-button" ng-click="cancel()">
+						<span>X</span>
+					</md-button>
+				</div>
+		</md-toolbar>
+    <md-dialog-content>
+				<md-input-container class="md-block">
+					<label>Name</label>
+					<input  required name="Name" ng-model="newInput.name">
+				</md-input-container>
+				<md-input-container class="md-block">
+					<label>Desciption</label>
+					<input  required name="desc" ng-model="newInput.desc">
+				</md-input-container>
+				<md-input-container class="md-block">
+					<label>Size</label>
+					<input  required name="size" ng-model="newInput.size">
+				</md-input-container>
+				<md-input-container class="md-block">
+					<label>tyoe</label>
+					<input  required name="type" ng-model="newInput.type">
+				</md-input-container>
+    </md-dialog-content>
+    <md-dialog-actions class="md-actions">
+			<button ng-click="saveNewColumn()">Add</button><button>Close</button>
+    </md-dialog-actions> 
+</md-dialog>

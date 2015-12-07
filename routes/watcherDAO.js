@@ -106,6 +106,19 @@ var getAllTemplates = function(){
 	loadTemplates();
 	return watcher;
 }
+var getMaxTemplateId = function(){
+	loadTemplates();
+	
+	var maxId = 0;
+	for (temp in watcher){
+		var tempId = +temp
+			if (tempId > maxId) {
+				maxId = tempId;
+			}
+	}
+	return maxId;
+	
+}
 // saved data for the template
 var getCurrentTemplateData = function(templateId){
 	var currentTemplateData = {};
@@ -132,6 +145,7 @@ var updateWatcherData = function(id, updatedData){
 	common.writeJsonFile(watcherDataFileName,watcherData);	
 }
 
+
 var removeFromWatcherData = function(id, symbol)
 {
 	console.log("removing "+symbol+" from "+id);
@@ -145,9 +159,43 @@ var removeFromWatcherData = function(id, symbol)
 	updateWatcherData(id, watcher);
 	
 }
+
+var persistTemplate = function(template){
+	var watcherTemplates = common.readAll(watcherTemplatesFileName);
+
+	var hasTemplate = false;
+	for(idx in watcherTemplates){
+		if (watcherTemplates[idx].id == template.id) {
+			watcherTemplates[idx] = template;
+			hasTemplate = true;
+			break;
+		}
+	}
+	if (!hasTemplate) {
+		watcherTemplates.push(template);	
+	}
+	
+	common.writeJsonFile(watcherTemplatesFileName,watcherTemplates);
+	
+}
+var getRawTemplate = function(templateId){
+	var watcherTemplates = common.readAll(watcherTemplatesFileName);
+	var template = {}
+	for(idx in watcherTemplates){
+		if (watcherTemplates[idx].id == templateId) {
+			template = watcherTemplates[idx];
+			break;
+		}
+	}
+	return template;
+}
+
 exports.getCurrentTemplateData = getCurrentTemplateData;
 exports.getCurrentTemplate = getCurrentTemplate;
 exports.getAllTemplates = getAllTemplates
 exports.updateWatcherData = updateWatcherData
 exports.removeFromWatcherData = removeFromWatcherData;
 exports.buildMetaData = buildMetaData;
+exports.getMaxTemplateId = getMaxTemplateId;
+exports.persistTemplate = persistTemplate;
+exports.getRawTemplate = getRawTemplate;

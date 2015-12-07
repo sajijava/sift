@@ -35,5 +35,75 @@ module.exports = {
 		"shares":{"source":"Q", "attribute":"s1","desc":"Shares Owned","type":"I", "align":"R", "size":11},
 		"shortRatio":{"source":"Q", "attribute":"s7","desc":"Short Ratio","type":"P", "align":"R", "size":7}, 	
 		"volume":{"source":"Q", "attribute":"v","desc":"Volume","type":"I", "align":"R", "size":11}
+	/*
+	 *companyname
+primaryexchange">Nasdaq Capital Market</value>
+primarysymbol
+sicdescription
+receiveddate
+periodlengthcode
+periodlength
+periodenddate
+formtype
+fiscalyear
+fiscalquarter
+currencycode">USD</value>
+changeincurrentassets
+changeincurrentliabilities
+changeininventories
+dividendspaid
+effectofexchangerateoncash
+capitalexpenditures
+cashfromfinancingactivities
+cashfrominvestingactivities
+cashfromoperatingactivities
+cfdepreciationamortization
+changeinaccountsreceivable
+investmentchangesnet
+netchangeincash
+totaladjustments
+ebit
+costofrevenue
+discontinuedoperations
+equityearnings
+accountingchange
+extraordinaryitems
+grossprofit
+incomebeforetaxes
+interestexpense
+netincome
+netincomeapplicabletocommon
+researchdevelopmentexpense
+totalrevenue
+sellinggeneraladministrativeexpenses
+commonstock
+deferredcharges
+cashandcashequivalents
+cashcashequivalentsandshortterminvestments
+goodwill
+intangibleassets
+inventoriesnet
+minorityinterest
+otherassets
+othercurrentassets
+othercurrentliabilities
+otherequity
+otherliabilities
+preferredstock"/>
+propertyplantequipmentnet
+retainedearnings
+totalassets
+totalcurrentassets
+totalcurrentliabilities
+totalliabilities
+totallongtermdebt
+totalreceivablesnet
+totalshorttermdebt
+totalstockholdersequity
+treasurystock
+
+	 **/
+	
+	
 	
 }
