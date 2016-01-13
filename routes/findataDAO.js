@@ -1,14 +1,18 @@
+var common = require('./common');
 var yahooFinance = require('yahoo-finance');
 var _ = require('lodash');
 var fieldSrc = require('./fieldSource');
 var math = require('mathjs')
+var enums = require('./Enums');
+
+var statmtFolder = 'finStatmt/'
 
 var getDataFromYahoo = function(symbols, sourceFlds){
 	
-	//console.log(attributes);
+	//console.log(sourceFlds);
 	// find attributed based on sourceFlds
 	var attributes = getYahooKeys(sourceFlds);
-	console.log(sourceFlds);
+	//console.log(sourceFlds);
 	console.log(attributes);
 	return yahooFinance.snapshot({
 		symbols: symbols,
@@ -23,18 +27,24 @@ var getDataFromYahoo = function(symbols, sourceFlds){
 	
 }
 
+
 // get all yahoo attribute e.g. l1: { field: 'close', value: 0 },
-var getYahooKeys = function(sourceFlds){
+var getYahooKeys = function(sourceFlds){ return getFieldsBySourceType(sourceFlds,enums.datasource.Quote); }
+var getFinStatmentFields = function(sourceFlds){ return getFieldsBySourceType(sourceFlds,enums.datasource.Fin); }
+
+var getFieldsBySourceType = function(sourceFlds,fieldSourceType){
 	var attributes = {}
 	
 	for(src in sourceFlds){
-			if (!_.isUndefined(fieldSrc[src])) {
+			if (!_.isUndefined(fieldSrc[src]) && fieldSrc[src].source == fieldSourceType) {
 				attributes[fieldSrc[src].attribute] = {"field":src,"value":0};
 			}
 		}
 
 	return attributes;
 }
+
+
 // map the values of the attributes from yahoo to fields in templates.
 var mapQuoteSnapShot = function(snapshot,attributes){
 	var sourceData = {};
@@ -131,8 +141,29 @@ var round = function(digit)
 	return digit.toFixed(2);
 }
 
+var persistFinStatment = function(symbol, data){
+	if (data != null) {
+		var completeFileName = statmtFolder+symbol+'.json'
+		common.writeJsonFile(completeFileName,data);	
+	}
+}
+var readFinStatment = function(symbol){
+	var stmtData = undefined;
+	var completeFileName = statmtFolder+symbol+'.json'
+	stmtData = common.readAll(completeFileName);
+	return (_.isEmpty(stmtData))?undefined:stmtData;
+}
+
+var fetchData = function(symbol, callbkFn){
+	var completeFileName = statmtFolder+symbol+'.json'
+	return common.createIfNotFileExist(completeFileName,callbkFn);
+}
 exports.createRow = createRow;
 exports.getYahooKeys = getYahooKeys;
+exports.getFinStatmentFields = getFinStatmentFields;
 exports.mapQuoteSnapShot = mapQuoteSnapShot;
 exports.getDataFromYahoo = getDataFromYahoo;
 exports.mergeMap = mergeMap;
+exports.persistFinStatment = persistFinStatment;
+exports.readFinStatment = readFinStatment;
+exports.fetchData = fetchData;

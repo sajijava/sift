@@ -1,0 +1,50 @@
+<md-dialog aria-label="Add New Field"  ng-cloak id="dialogFormula">
+		<md-toolbar>
+				<div class="md-toolbar-tools">
+					<h2>Add Formula Column</h2>
+					<span flex></span>
+					<md-button class="md-icon-button" ng-click="cancel()">
+						<span>X</span>
+					</md-button>
+				</div>
+		</md-toolbar>
+    <md-dialog-content>
+				<md-input-container class="md-block">
+					<label>Name</label>
+					<input  required name="Name" ng-model="newInput.name">
+				</md-input-container>
+				<md-input-container class="md-block">
+					<label>Desciption</label>
+					<input  required name="desc" ng-model="newInput.desc">
+				</md-input-container>
+				<div layout="row">
+						<div layout="column" flex="25">
+								<div ng-repeat="item in sourceFields"  draggable index="sourceFields:{{$index}}" >{{item.desc}}</div>
+						</div>
+						<div flex="auto">
+								<!--div  layout="column">
+										<div>
+												<div layout="row">
+														<div ng-repeat="item in mathOperations.operations"  draggable  index="operations:{{$index}}" >&nbsp;{{item}}&nbsp;</div>
+												</div>
+										</div>
+										<div flex="auto" class="formulaEdit" droppable drop="makeFormula">
+												<exp-item ng-repeat="exp in formula" value='exp.value' ></exp-item>
+										</div>
+								</div-->
+								
+								<div layout="column" flex="grow" class="formulaEdit"  >
+										<textarea rows="5" cols="20" ng-keypress="keyPress($event)" ng-model="formulaText"></textarea>
+								</div>
+						</div>
+						<!-- this will be an added feature in later
+						<div flex="10">
+								<div ng-repeat="item in mathOperations.functions"  draggable index="functions:{{$index}}" >{{item}}</div>
+						</div>
+						-->
+				</div>
+    </md-dialog-content>
+    <md-dialog-actions class="md-actions">
+			<button ng-click="saveNewColumn()">Add</button><button ng-click="cancel()">Close</button>
+    </md-dialog-actions> 
+</md-dialog>

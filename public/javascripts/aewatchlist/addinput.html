@@ -22,11 +22,15 @@
 					<input  required name="size" ng-model="newInput.size">
 				</md-input-container>
 				<md-input-container class="md-block">
-					<label>tyoe</label>
-					<input  required name="type" ng-model="newInput.type">
+					<label>type</label>
+					<md-select required name="type" ng-model="newInput.type">
+						<md-option ng-repeat="(key,val) in dataTypes" value="{{val}}">
+							{{key}}
+						</md-option>
+					</md-select>
 				</md-input-container>
     </md-dialog-content>
     <md-dialog-actions class="md-actions">
-			<button ng-click="saveNewColumn()">Add</button><button>Close</button>
+			<button ng-click="saveNewColumn()">Add</button><button ng-click="cancel()">Close</button>
     </md-dialog-actions> 
 </md-dialog>

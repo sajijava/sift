@@ -1,6 +1,6 @@
 [
  {
-  "id": "1",
+  "templateId": "1",
   "name": "BiotechBelow$1",
   "table": [
    {
@@ -20,7 +20,7 @@
    },
    {
     "header": "Elapse Day",
-    "name": "elapseDt",
+    "name": "elapseDt",	
     "formula": "Date - entryDate",
     "order": 2,
     "type": "D",
@@ -109,19 +109,20 @@
    },
    {
     "header": "Most Recent Qtr",
-    "name": "recentQtr",
+    "name": "periodenddate",
     "order": 13,
-    "size": 7,
-    "source": "I"
+    "size": 11,
+		"align": "L"
+		
    },
    {
     "header": "Burn Qrt",
     "name": "burnQrt",
+		"formula": "capitalexpenditures + cashfromoperatingactivities",
     "order": 14,
     "type": "C",
     "size": 7,
-    "align": "R",
-    "source": "I"
+    "align": "R"
    },
    {
     "header": "Burn Ratio (mnth)",
@@ -139,7 +140,7 @@
     "type": "C",
     "size": 12,
     "align": "R",
-    "source": "I"
+    "formula":"cashandcashequivalents"
    },
    {
     "header": "Opt Coverage",
@@ -202,99 +203,5 @@
     }
    ]
   }
- },
- {
-  "id": 2,
-  "name": "New",
-  "table": [
-   {
-    "header": "Symbol",
-    "name": "symbol",
-    "order": 0,
-    "source": "",
-    "size": 6
-   },
-   {
-    "header": "Ask",
-    "name": "ask",
-    "order": 1,
-    "type": "C",
-    "size": 7,
-    "align": "R"
-   },
-   {
-    "header": "Change",
-    "name": "change",
-    "order": 2,
-    "type": "C",
-    "size": 7,
-    "align": "R"
-   },
-   {
-    "header": "Volume",
-    "name": "volume",
-    "order": 4,
-    "type": "I",
-    "size": 11,
-    "align": "R"
-   },
-   {
-    "header": "Dividend Per Share",
-    "name": "divPerShare",
-    "order": 5,
-    "type": "C",
-    "size": 7,
-    "align": "R"
-   }
-  ],
-  "formatting": {},
-  "desc": "What New"
- },
- {
-  "id": 3,
-  "name": "",
-  "table": [
-   {
-    "header": "Symbol",
-    "name": "symbol",
-    "order": 0,
-    "source": "",
-    "size": 6
-   },
-   {
-    "header": "Peee",
-    "name": "PPPP",
-    "order": 99,
-    "type": "I",
-    "size": "8",
-    "source": "I",
-    "align": "R"
-   }
-  ],
-  "formatting": {}
- },
- {
-  "id": 4,
-  "name": "Test",
-  "table": [
-   {
-    "header": "Symbol",
-    "name": "symbol",
-    "order": 0,
-    "source": "",
-    "size": 6
-   },
-   {
-    "header": "uejjehj",
-    "name": "OOOO",
-    "order": 99,
-    "type": "kjksj",
-    "size": "299",
-    "source": "I",
-    "align": "R"
-   }
-  ],
-  "formatting": {},
-  "desc": "New"
  }
 ]

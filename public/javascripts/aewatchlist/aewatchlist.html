@@ -24,13 +24,13 @@
 		
 	<div flex="20">
 		<div   layout="column" droppable drop="removeColumn">
-			<div ng-repeat="item in sourceFields"  draggable index="{{$index}}" ng-show="item.show">{{item.desc}}</div>
+			<div ng-repeat="item in sourceFields"  draggable index="sourceFields:{{$index}}" ng-show="item.show">{{item.desc}}</div>
 		</div>
 	</div>	
 
 	<div>
 		<a ng-click="addInputField()">Add Input Field</a>
-		<a ng-click="">Add a Formula</a>
+		<a ng-click="addFormulaField()">Add a Formula</a>
 	</div>	
 	<div class="thumbnail" droppable drop="addColumn" layout="row">
 		<div id="viewGrid" class="w-grid">

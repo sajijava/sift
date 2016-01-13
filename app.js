@@ -8,6 +8,11 @@ var routes = require('./routes');
 var user = require('./routes/user');
 var watcher = require('./routes/watcher');
 var createTemplate = require('./routes/createTemplate');
+
+var downloadStmts = require('./routes/downloadStatements');
+var dbView = require('./routes/dbview');
+
+
 var http = require('http');
 var path = require('path');
 
@@ -37,8 +42,10 @@ app.get('/', function(req, res){
 
 watcher.setRESTInterfaces(app);
 createTemplate.setRESTInterfaces(app);
-//watcher.initialize();
+dbView.setRESTInterfaces(app);
 
+//watcher.initialize();
+downloadStmts.downloadAll("YHOO");
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

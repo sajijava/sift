@@ -34,7 +34,11 @@ module.exports = {
 		"symbol":{"source":"Q", "attribute":"s","desc":"Symbol","type":"T", "align":"L", "size":7}, 	
 		"shares":{"source":"Q", "attribute":"s1","desc":"Shares Owned","type":"I", "align":"R", "size":11},
 		"shortRatio":{"source":"Q", "attribute":"s7","desc":"Short Ratio","type":"P", "align":"R", "size":7}, 	
-		"volume":{"source":"Q", "attribute":"v","desc":"Volume","type":"I", "align":"R", "size":11}
+		"volume":{"source":"Q", "attribute":"v","desc":"Volume","type":"I", "align":"R", "size":11},
+		"periodenddate":{"source":"F", "attribute":"periodenddate","desc":"Most Recent Qtr","type":"D", "align":"L", "size":11},
+		"capitalexpenditures":{"source":"F", "attribute":"capitalexpenditures","desc":"Capex","type":"C", "align":"R", "size":11},
+		"cashfromoperatingactivities":{"source":"F", "attribute":"cashfromoperatingactivities","desc":"Cash from Ops","type":"C", "align":"R", "size":11},
+		"cashandcashequivalents":{"source":"F", "attribute":"cashandcashequivalents","desc":"Cash & Cash Eq","type":"C", "align":"R", "size":11}
 	/*
 	 *companyname
 primaryexchange">Nasdaq Capital Market</value>

@@ -7,6 +7,8 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
 	$scope.sampleGrid = [];
 	$scope.header = [];
 	$scope.saved  = false;
+	$scope.dataTypes = {}
+	$scope.mathOps = {}
 	
 	aeWatchlistService.getSourceFields()
 	.then(function(d){
@@ -16,6 +18,15 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
 		}
 	});
 	
+	aeWatchlistService.getDataTypes()
+	.then(function(d){
+		$scope.dataTypes = d;
+	})
+
+	aeWatchlistService.getMathops()
+	.then(function(d){
+		$scope.mathOps = d;
+	})
 
 	
 	
@@ -41,19 +52,28 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
 	
 	initPage();
 	
+	
+	/*
+	 * Add columns
+	 **/
 	$scope.addColumn = function(d) {
-		$scope.sourceFields[d].show = false;
-		
-		var src = $scope.sourceFields[d];
-		var row = {"header":src.desc,
-								"name":src.name,
-								"order":$scope.aeWatchlistForm.table.length - 1,
-								"type":src.type,
-								"size":src.size,
-								"align":src.align};
-		
-		$scope.aeWatchlistForm.table.push(row);
-		getData();		
+		var dropItem = d.split(":");
+		if (dropItem.length > 1 && dropItem[0] == "sourceFields") {
+			
+			var idx = dropItem[1];
+			$scope.sourceFields[idx].show = false;
+			
+			var src = $scope.sourceFields[idx];
+			var row = {"header":src.desc,
+									"name":src.name,
+									"order":$scope.aeWatchlistForm.table.length - 1,
+									"type":src.type,
+									"size":src.size,
+									"align":src.align};
+			
+			$scope.aeWatchlistForm.table.push(row);
+			getData();
+		}
 	};
 	
 	var getData = function(){
@@ -115,6 +135,13 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
 		$route.reload();
 		$window.refresh();
 	}
+
+
+
+	/*
+	 * Add New input column
+	 **/
+
 	var addInputColumn = function(newColumn){
 		var align = "R";
 		if (newColumn.type == 'T') {
@@ -134,6 +161,7 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
 	}
 	
 	$scope.customFullscreen = $mdMedia('sm');
+	
 	$scope.addInputField = function(ev){
 	 $mdDialog.show({
       controller: addInputDialogController,
@@ -141,7 +169,10 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
       parent: angular.element(document.body),
       targetEvent: ev,
       clickOutsideToClose:true,
-      fullscreen: $mdMedia('sm') && $scope.customFullscreen
+      fullscreen: $mdMedia('sm') && $scope.customFullscreen,
+			locals:{
+				dataTypes : $scope.dataTypes
+			}
     })
     .then(function(newInput) {
 			console.log(newInput);
@@ -150,13 +181,21 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
       $scope.status = 'You cancelled the dialog.';
     });
 	};
-	var addInputDialogController = function($scope,$mdDialog){
+	var addInputDialogController = function($scope,$mdDialog,dataTypes){
 		$scope.newInput = {};
+		$scope.dataTypes=dataTypes;
 		$scope.saveNewColumn = function(){
 			$mdDialog.hide($scope.newInput);
 		}
+		$scope.cancel = function(){
+			$mdDialog.cancel();
+		}
 	}
 	
+	/*
+	 * Add new formula
+	 **/
+
 	$scope.addFormulaField = function(ev){
 	 $mdDialog.show({
       controller: addFormulaDialogController,
@@ -164,20 +203,58 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
       parent: angular.element(document.body),
       targetEvent: ev,
       clickOutsideToClose:true,
-      fullscreen: $mdMedia('sm') && $scope.customFullscreen
+      fullscreen: $mdMedia('sm') && $scope.customFullscreen,
+			locals :{
+				sourceFields : $scope.sourceFields,
+				mathOps : $scope.mathOps
+				
+			}
     })
     .then(function(newInput) {
 			console.log(newInput);
 			addInputColumn(newInput);
     }, function() {
-      $scope.status = 'You cancelled the dialog.';
+      
     });
 	};
-	var addFormulaDialogController = function($scope,$mdDialog){
+	var addFormulaDialogController = function($scope,$mdDialog, sourceFields, mathOps){
 		$scope.newInput = {};
+		$scope.sourceFields = sourceFields;
+		$scope.mathOperations = mathOps;
+		$scope.formula = [];
 		$scope.saveNewColumn = function(){
 			$mdDialog.hide($scope.newInput);
 		}
+		$scope.cancel = function(){
+			$mdDialog.cancel();
+		}
+		$scope.makeFormula = function(d){
+			var idSplit = d.split(":");
+			if (idSplit.length > 1) {
+				var source = idSplit[0];
+				var idx = idSplit[1];
+				
+				if (source == 'sourceFields') {
+					var item = $scope.sourceFields[idx];
+					$scope.formula.push({'key':item.name,'value':item.desc});
+				}else if (source == 'functions') {
+					var item = $scope.mathOperations.functions[idx];
+					$scope.formula.push({'key':item,'value':item});
+				}else if (source == 'operations') {
+					var item = $scope.mathOperations.operations[idx];
+					$scope.formula.push({'key':item,'value':item});
+				}
+			}
+			console.log($scope.formula);
+					
+		}
+		$scope.formulaText = "";
+		$scope.keyPress = function($event){
+				console.log($event);
+				
+			}
+		
+		
 	}
 	
 	
@@ -202,11 +279,32 @@ aewatchlist.factory('aeWatchlistService',['$http','$q',function($http,$q){
 			getSourceFields : function(){ return callHttp({method:'GET',url:urlPrefix+"/get/template/fieldlist"})},
 			getData : function(data){ return callHttp({method:'POST',url:urlPrefix+"/get/template/sampledata",data:data})},
 			getTemplateObject : function(id){ return callHttp({method:'GET',url:urlPrefix+"/get/template/object/"+id})},
+			getDataTypes : function(){ return callHttp({method:'GET',url:urlPrefix+"/get/template/datatypes"})},
+			getMathops : function(){ return callHttp({method:'GET',url:urlPrefix+"/get/template/mathops"})},
 			
 			saveData : function(data){ return callHttp({method:'POST',url:urlPrefix+"/get/template/savetemplate",data:data})},
 			
 	}
 }]);
+
+aewatchlist.directive('expItem',function(){
+	return {
+		restrict:'E',
+		transclude:true,
+		scope:{
+			key:'=',
+			value:'=',
+			remove:'&'
+		},
+		template:"<span ng-keypress='keyPress' class='lrspacing'>{{value}}</span>",
+		controller:function($scope){
+			$scope.keyPress = function($event){
+				console.log($event)
+			}
+		}
+		
+	}
+});
 
 aewatchlist.directive('draggable',function(){
 		return {

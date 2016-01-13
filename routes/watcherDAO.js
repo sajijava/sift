@@ -1,6 +1,10 @@
 var common = require('./common');
 var fieldSrc = require('./fieldSource');
 var _ = require('lodash');
+var mongoClient = require('mongodb').MongoClient;
+var assert = require('assert');
+var enums = require('./Enums');
+
 
 var watcherTemplatesFileName= 'WatcherTemplates.json';
 var watcherDataFileName = "WatcherData.json";
@@ -18,13 +22,51 @@ var loadData = function(){
 	//console.log(watcherData)
 }
 
+
+var persistTemplate = function(template){
+	
+	console.log(template);
+	
+	enums.dbCall(function(db){	
+		db.collection('rawtemplate')
+			.insertOne(template,
+					function(err, results) {
+						assert.equal(null, err);
+							var watchertemp = buildWatcherTemplates(template);
+							db.collection('watchertemplate')
+						  .insertOne(watchertemp, function(err, results){
+									assert.equal(null, err);
+									console.log("template added")
+								})
+					});
+		});
+}
+
+var buildWatcherTemplates = function(rawTemplate){
+	var watcher = {};
+	
+	var id = rawTemplate.templateId;
+	var metaData = buildMetaData(rawTemplate.table);
+		
+	watcher[id] = {
+										"name":rawTemplate.name,
+										"template":rawTemplate.table,
+										"formatting":rawTemplate.formatting,
+										"header":metaData.header,// only the header
+										"sourceFlds":metaData.sourceFlds // find all source fields
+									};
+	return watcher;
+}
 // this shouldn be cached
 loadTemplates = function(){
 	var watcherTemplates = common.readAll(watcherTemplatesFileName);
+//	persistTemplate(watcherTemplates[0]);
 
+/*
+	
 	watcher = {};
 	for (template in watcherTemplates) {
-		var id = watcherTemplates[template].id;
+		var id = watcherTemplates[template].templateId;
 		var metaData = buildMetaData(watcherTemplates[template].table);
 		
 		watcher[id] = {
@@ -37,6 +79,7 @@ loadTemplates = function(){
 									};
 	}
 	;
+	*/
 	//console.log(watcher);
 }
 
@@ -68,9 +111,9 @@ var buildMetaData  = function(table){
 		if (_.isUndefined(inputFlds[row.name])) {
 		
 			if (_.isUndefined(row.formula)) {
-				sourceFlds[row.name] = {};
+				sourceFlds[row.name] = getFieldAttributes(row.name);
 			}else{
-				sourceFlds[row.name] = {};
+				sourceFlds[row.name] = getFieldAttributes(row.name);
 				parseFormula(row.formula,sourceFlds,inputFlds);
 			}
 		}
@@ -80,16 +123,21 @@ var buildMetaData  = function(table){
 	return {"header":header,"sourceFlds":sourceFlds};
 }
 
+
+var getFieldAttributes = function(fieldName){
+	 return _.isUndefined(fieldSrc[fieldName])?{}:fieldSrc[fieldName];
+}
+
 // parse formula and add the fields to sourceFld or inputFld list
 var parseFormula = function(formula, sourceFlds,inputFlds){
 
 	for(field in fieldSrc)
 	{
-		if(formula.indexOf(field) > 0)
+		if(formula.indexOf(field) > -1)
 		{
 			if(_.isUndefined(sourceFlds[field]) && _.isUndefined(inputFlds[field]))
 			{
-				sourceFlds[field] = {};
+				sourceFlds[field] = getFieldAttributes(field);
 			}
 		}
 	}
@@ -124,12 +172,16 @@ var getCurrentTemplateData = function(templateId){
 	var currentTemplateData = {};
 	
 	loadData();
+	
+	//console.log(watcherData);
 	for (watcher in watcherData) {
+		//console.log(watcherData[watcher].id+" == "+ templateId)
 		if (watcherData[watcher].id == templateId) {
 			currentTemplateData = watcherData[watcher];
 			break;
 		}
 	}
+	
 	return currentTemplateData;
 }
 
@@ -160,35 +212,20 @@ var removeFromWatcherData = function(id, symbol)
 	
 }
 
-var persistTemplate = function(template){
-	var watcherTemplates = common.readAll(watcherTemplatesFileName);
 
-	var hasTemplate = false;
-	for(idx in watcherTemplates){
-		if (watcherTemplates[idx].id == template.id) {
-			watcherTemplates[idx] = template;
-			hasTemplate = true;
-			break;
-		}
-	}
-	if (!hasTemplate) {
-		watcherTemplates.push(template);	
-	}
-	
-	common.writeJsonFile(watcherTemplatesFileName,watcherTemplates);
-	
-}
 var getRawTemplate = function(templateId){
 	var watcherTemplates = common.readAll(watcherTemplatesFileName);
 	var template = {}
 	for(idx in watcherTemplates){
-		if (watcherTemplates[idx].id == templateId) {
+		if (watcherTemplates[idx].templateId == templateId) {
 			template = watcherTemplates[idx];
 			break;
 		}
 	}
 	return template;
 }
+
+
 
 exports.getCurrentTemplateData = getCurrentTemplateData;
 exports.getCurrentTemplate = getCurrentTemplate;

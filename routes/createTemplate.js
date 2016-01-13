@@ -1,4 +1,4 @@
-
+var enums = require('./Enums');
 var fieldSrc = require('./fieldSource');
 var dao = require('./watcherDAO');
 var Promise = require('bluebird');
@@ -14,7 +14,11 @@ var getFieldSource = function(req, res){
 		field.name = item;
 		fieldList.push(field);
 	}
-	
+	fieldList.sort(function(a,b){
+			var x = a.desc.toLowerCase();
+			var y = b.desc.toLowerCase();
+			return x < y ? -1 : x > y ? 1 : 0;
+		})
 	res.json(fieldList)
 }
 var getTemplateObject = function(req, res){
@@ -47,7 +51,12 @@ var getSampleData = function(req,res){
 	
 	return new Promise(function(resolve, reject){
 				var src = templateMetaData.sourceFlds
-				resolve(findataDAO.getDataFromYahoo(sampleSymbols,src));
+				var returnObj = {};
+				if (!_.isEmpty(src)) {
+					returnObj = findataDAO.getDataFromYahoo(sampleSymbols,src);
+				}
+				 
+				resolve(returnObj);
 
 		}).then(function(snapshot){ //relabel yahoo data
 				console.log("second then");
@@ -78,17 +87,30 @@ var getSampleData = function(req,res){
 	
 }
 
+var getDataType = function(req, res){
+	res.json(enums.datatype);
+}
+
 var saveTemplate = function(req, res){
 	console.log("prepare to save");
 	console.log(req.body);
 	dao.persistTemplate(req.body);
 	res.json({success:true});
 }
+
+var getMathOperation = function(req, res){
+	var mathOperations = {};
+	mathOperations["operations"] = ["+","-","*","/","^"];
+	mathOperations["functions"] = ["abs(x)","ceil(x)","exp(x)","floor(x)","log(x [, base])","log10(x)","round(x [, n])","sqrt(x)"]
+	mathOperations["functions"].sort();
+	res.json(mathOperations);
+}
 exports.setRESTInterfaces = function(app){
 	
 	app.get('/api/get/template/fieldlist', getFieldSource);
 	app.get('/api/get/template/object/:watcherid',getTemplateObject);
-	
+	app.get('/api/get/template/datatypes', getDataType);
+	app.get('/api/get/template/mathops', getMathOperation);
 	
 	app.post('/api/get/template/sampledata', getSampleData);
 	app.post('/api/get/template/savetemplate', saveTemplate);

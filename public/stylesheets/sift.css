@@ -79,3 +79,15 @@ md-input-container{
   border-radius: 5px;
   margin-bottom: 5px;
 }
+#dialogFormula{
+  min-width: 600px;
+}
+
+#dialogFormula .formulaEdit{
+  height:150px;
+  background-color: #DDD;
+}
+/*.lrspacing{
+  padding-left: 2px;
+  padding-right: 2px;
+}*/

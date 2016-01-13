@@ -50,7 +50,17 @@ var getAllWithDefault = function(filename, defaultType)
         all = defaultType;
     }
     return all;
-}	
+}
+exports.createIfNotFileExist = function(fileName, callbkFn){
+		var filepath = __dirname + '/json/' + fileName
+		fs.exists(filepath,function(exist){
+        if (!exist) {
+						callbkFn();
+        }else{
+						console.log(filepath+" already exist..")
+				}
+    })
+}
 exports.getFileName = function(filename){
         return filename + ".json";
 }

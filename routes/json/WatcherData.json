@@ -1,6 +1,6 @@
 [
  {
-  "id": "001",
+  "id": "1",
   "data": [
    {
     "symbol": "LPTN",
@@ -84,15 +84,6 @@
     "cash": "39"
    },
    {
-    "symbol": "DARA",
-    "entryDate": "09/25/2015",
-    "initPrice": "0.89",
-    "shares": "19.76",
-    "recentQtr": "201506",
-    "burnQrt": "-3",
-    "cash": "7"
-   },
-   {
     "symbol": "XXII",
     "entryDate": "09/25/2015",
     "initPrice": "0.86",
@@ -120,15 +111,6 @@
     "cash": "16"
    },
    {
-    "symbol": "NBY",
-    "entryDate": "01/11/2015",
-    "initPrice": "0.179",
-    "shares": "85.94",
-    "recentQtr": "201506",
-    "burnQrt": "-5",
-    "cash": "7"
-   },
-   {
     "symbol": "STEM",
     "entryDate": "01/11/2015",
     "initPrice": "0.393",
@@ -147,7 +129,7 @@
     "cash": "26"
    },
    {
-    "symbol": " CVM",
+    "symbol": "CVM",
     "entryDate": "01/11/2015",
     "initPrice": "0.53",
     "shares": "130.62",
@@ -156,7 +138,7 @@
     "cash": "11"
    },
    {
-    "symbol": " ENZN",
+    "symbol": "ENZN",
     "entryDate": "01/11/2015",
     "initPrice": "0.66",
     "shares": "44.18",
@@ -165,7 +147,7 @@
     "cash": "39"
    },
    {
-    "symbol": " IBIO",
+    "symbol": "IBIO",
     "entryDate": "01/11/2015",
     "initPrice": "0.67",
     "shares": "77.33",
@@ -174,7 +156,7 @@
     "cash": "9"
    },
    {
-    "symbol": " SNTA",
+    "symbol": "SNTA",
     "entryDate": "01/11/2015",
     "initPrice": "0.67",
     "shares": "136.44",
@@ -183,7 +165,7 @@
     "cash": "98"
    },
    {
-    "symbol": " RCPI",
+    "symbol": "RCPI",
     "entryDate": "01/11/2015",
     "initPrice": "0.87",
     "shares": "10.87",
@@ -192,7 +174,7 @@
     "cash": "3"
    },
    {
-    "symbol": " SNSS",
+    "symbol": "SNSS",
     "entryDate": "01/11/2015",
     "initPrice": "0.88",
     "shares": "75.47",
@@ -201,7 +183,7 @@
     "cash": "40"
    },
    {
-    "symbol": " OXGN",
+    "symbol": "OXGN",
     "entryDate": "01/11/2015",
     "initPrice": "0.92",
     "shares": "26.50",

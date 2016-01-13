@@ -16,7 +16,26 @@ test.controller('testCtrl',['$scope','$mdDialog',function($scope,$mdDialog){
         alert('Item has been dropped');
     }
 	
+	$scope.suggestions = [];
+	
+	$scope.suggestions.push({"id":"1","State":"Alabama","zip":"0000001"});
+	$scope.suggestions.push({"id":"2","State":"Alaska","zip":"0000002"});
+	$scope.suggestions.push({"id":"3","State":"New Jersey","zip":"0000003"});
+	$scope.suggestions.push({"id":"4","State":"New York","zip":"0000004"});
+	$scope.suggestions.push({"id":"5","State":"Colorado","zip":"0000005"});
+	$scope.suggestions.push({"id":"6","State":"Utah","zip":"0000006"});
+	$scope.suggestions.push({"id":"7","State":"California","zip":"0000007"});
+	
+	$scope.keyPress = function($event){
+					console.log($event)
+					
+				}
+	
 }]);
+
+$('#div,#inputtext').keyup(function(event){
+    console.log(event.keyCode);
+});
 
 
 test.directive('draggable',function(){
@@ -107,4 +126,26 @@ test.directive('droppable', function(){
 						},false);
 				}
 		}
+});
+
+test.directive('typeAheadText', function(){
+		return {
+			restrict:'E',
+			transclude:true,
+			scope:{
+				datalist:'=',
+				displayfield:'@'
+			},
+			template:"test:<div ng-keypress='keyPress' class='lrspacing' tabindex='1'>{{value}}</div>",
+			controller:function($scope){
+				$scope.value = "Please type";
+				$scope.keyPress = function($event){
+					console.log($event)
+					$scope.value += $event.keyCode;
+				}
+			}
+		
+	}
+				
+		
 });
