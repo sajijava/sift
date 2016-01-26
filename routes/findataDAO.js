@@ -11,9 +11,9 @@ var getDataFromYahoo = function(symbols, sourceFlds){
 	
 	//console.log(sourceFlds);
 	// find attributed based on sourceFlds
-	var attributes = getYahooKeys(sourceFlds);
+	var attributes = getYahooFieldAttr(sourceFlds);
 	//console.log(sourceFlds);
-	console.log(attributes);
+	console.log(_.keys(attributes));
 	return yahooFinance.snapshot({
 		symbols: symbols,
 		fields: _.keys(attributes)  // ex: ['s', 'n', 'd1', 'l1', 'y', 'r']
@@ -22,25 +22,32 @@ var getDataFromYahoo = function(symbols, sourceFlds){
 			console.log(snapshot);			
 			
 			
-		});
+		})
+	.then(function( data){
+		console.log(data);
+		return mapQuoteSnapShot(data,attributes)
+	});
 	
 	
 }
 
 
 // get all yahoo attribute e.g. l1: { field: 'close', value: 0 },
-var getYahooKeys = function(sourceFlds){ return getFieldsBySourceType(sourceFlds,enums.datasource.Quote); }
+var getYahooFieldAttr = function(sourceFlds){ return getFieldsBySourceType(sourceFlds,enums.datasource.Quote); }
 var getFinStatmentFields = function(sourceFlds){ return getFieldsBySourceType(sourceFlds,enums.datasource.Fin); }
 
 var getFieldsBySourceType = function(sourceFlds,fieldSourceType){
 	var attributes = {}
 	
-	for(src in sourceFlds){
+	for(idx in sourceFlds){
+			var src = sourceFlds[idx]
 			if (!_.isUndefined(fieldSrc[src]) && fieldSrc[src].source == fieldSourceType) {
+		
 				attributes[fieldSrc[src].attribute] = {"field":src,"value":0};
 			}
 		}
 
+		
 	return attributes;
 }
 
@@ -52,6 +59,7 @@ var mapQuoteSnapShot = function(snapshot,attributes){
 				for(idx in snapshot){
 					
 					var resp = snapshot[idx];
+					//console.log("*"+resp)
 					sourceData[resp.symbol] = {}
 					var key = _.keys(attributes)
 					for(id in key){
@@ -64,6 +72,7 @@ var mapQuoteSnapShot = function(snapshot,attributes){
 					
 				}
 			}
+		//	console.log(sourceData)
 			return sourceData;
 	
 }
@@ -71,7 +80,7 @@ var createRow = function(template, data,formatting){
 
 	var row = _.clone(template,true);
 
-	//console.log(template);
+	//console.log(data);
 	for (item in row) {
 			
 		if (_.isUndefined(row[item].formula)) {
@@ -80,14 +89,16 @@ var createRow = function(template, data,formatting){
 				
 		}else{
 				try{
+					//console.log(row[item].formula);
+					
 					var res = round(math.eval(row[item].formula, data));
 					row[item]["data"] = (isNaN(res))?0:res;
-					data[row[item].name] = row[item]["data"];
 				}catch(e)
 				{
-					row[item]["data"] = "";
+					row[item]["data"] = 0;
 					console.error(e);	
 				}
+				data[row[item].name] = row[item]["data"];
 		}
 		
 		// apply column formatting
@@ -111,7 +122,12 @@ var createRow = function(template, data,formatting){
 	if (!_.isUndefined(formatting["row"])) {
 		var conditions = formatting["row"];
 		for(condIdx in conditions){
-			var result = math.eval(conditions[condIdx].cond, data);
+			var result = 0;
+			try{
+				result = math.eval(conditions[condIdx].cond, data);
+			}catch(e){
+				console.log(e);
+			}
 			if (result) {
 				row[0]["rowStyle"] = conditions[condIdx].style;
 			}
@@ -124,8 +140,8 @@ var createRow = function(template, data,formatting){
 
 var mergeMap = function(map1, arrMap){
 	
-	var sourceMap = arrMap[map1.symbol];
-
+	var sourceMap = arrMap;
+	//console.log(arrMap);
 	for(k in sourceMap)
 	{
 		
@@ -141,29 +157,48 @@ var round = function(digit)
 	return digit.toFixed(2);
 }
 
-var persistFinStatment = function(symbol, data){
-	if (data != null) {
-		var completeFileName = statmtFolder+symbol+'.json'
-		common.writeJsonFile(completeFileName,data);	
+var createFinStatment = function(symbol, data){
+	
+	if (!_.isUndefined(data)) {
+		
+		enums.dbCall()
+		.then(function(db){
+			db.collection(enums.tableName.FinDataConsolidated)
+			.insertOne(data);
+			})
 	}
 }
-var readFinStatment = function(symbol){
-	var stmtData = undefined;
-	var completeFileName = statmtFolder+symbol+'.json'
-	stmtData = common.readAll(completeFileName);
-	return (_.isEmpty(stmtData))?undefined:stmtData;
-}
 
+
+var getFinStatment = function(symbols){
+	
+	var filter = {}
+	if(_.isArray(symbols))
+	{
+		filter = {$or:symbols.map(function(s){
+														return {'symbol':s}
+													})
+						};
+		
+	}else{
+		filter = {'symbol':symbols};
+	}
+	
+	console.log(filter);
+	
+	return enums.getData(enums.tableName.FinDataConsolidated,filter);
+}
+/*
 var fetchData = function(symbol, callbkFn){
 	var completeFileName = statmtFolder+symbol+'.json'
 	return common.createIfNotFileExist(completeFileName,callbkFn);
-}
+}*/
 exports.createRow = createRow;
-exports.getYahooKeys = getYahooKeys;
+//exports.getYahooKeys = getYahooKeys;
 exports.getFinStatmentFields = getFinStatmentFields;
 exports.mapQuoteSnapShot = mapQuoteSnapShot;
 exports.getDataFromYahoo = getDataFromYahoo;
 exports.mergeMap = mergeMap;
-exports.persistFinStatment = persistFinStatment;
-exports.readFinStatment = readFinStatment;
-exports.fetchData = fetchData;
+exports.createFinStatment = createFinStatment;
+exports.getFinStatment = getFinStatment;
+//exports.fetchData = fetchData;

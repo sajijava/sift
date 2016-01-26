@@ -2,20 +2,23 @@ var edgarO = require('./edgarOnline');
 var dao = require('./watcherDAO');
 var _ = require('lodash');
 var findataDAO = require('./findataDAO');
+var commonDAO = require('./commonDAO');
 
 
 
 var downloadAll = function(){
-	var symbols = getSymbols()//.slice(1,3);
-	var i = 1;
+	 commonDAO.getAllSymbols()
+	 .then(function(symbols){
 
-	console.log("Download in....");
-	
-	symbols.forEach(function(symbol){
-		findataDAO.fetchData(symbol, function(){
-				setTimeout(download,2500 * i++,symbol);
+			var i = 1;
+		
+			console.log("Download in....");
+			
+			symbols.forEach(function(symbol){
+					setTimeout(download,2500 * i++,symbol);
 			})
-	})
+		
+	 })
 }
 
 
@@ -30,10 +33,28 @@ var download = function(symbol){
 var persistResponse = function(symbol, response){
 		console.log('^^^^^^^^^^^^^^^^^^^^^');
 		console.log(symbol);
-		//console.log(response);
-		findataDAO.persistFinStatment(symbol,translate(response));
+		
+		findataDAO.getFinStatment(symbol)
+		.then(function(d){
+			console.log(d);
+			var data = translate(response);
+			if (_.isUndefined(d) || _.isEmpty(d)) {
+				findataDAO.createFinStatment(symbol,data);		
+			}else{
+				var missingQrt = getMissingQtr(data, d)
+				if (_.isUndefined(missingQrt)) {
+					data.quarters.push(missingQrt);
+					findataDAO.updateFinStatment(symbol, data);
+				}
+				
+			}
+		})
 		
 		console.log('====================');
+}
+
+var getMissingQtr = function(newData, existingData){
+	return undefined;
 }
 
 var translate = function(response){

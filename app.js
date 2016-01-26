@@ -45,7 +45,7 @@ createTemplate.setRESTInterfaces(app);
 dbView.setRESTInterfaces(app);
 
 //watcher.initialize();
-downloadStmts.downloadAll("YHOO");
+//downloadStmts.downloadAll();
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

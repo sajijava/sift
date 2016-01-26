@@ -32,7 +32,7 @@ module.exports = {
 		"divPerShare":{"source":"Q", "attribute":"d","desc":"Dividend Per Share","type":"C", "align":"R", "size":7}, 	
 		"close":{"source":"Q", "attribute":"l1","desc":"Last Trade","type":"C", "align":"R", "size":7},
 		"symbol":{"source":"Q", "attribute":"s","desc":"Symbol","type":"T", "align":"L", "size":7}, 	
-		"shares":{"source":"Q", "attribute":"s1","desc":"Shares Owned","type":"I", "align":"R", "size":11},
+		"shares":{"source":"Q", "attribute":"j2","desc":"Shares Outstanding","type":"I", "align":"R", "size":11},
 		"shortRatio":{"source":"Q", "attribute":"s7","desc":"Short Ratio","type":"P", "align":"R", "size":7}, 	
 		"volume":{"source":"Q", "attribute":"v","desc":"Volume","type":"I", "align":"R", "size":11},
 		"periodenddate":{"source":"F", "attribute":"periodenddate","desc":"Most Recent Qtr","type":"D", "align":"L", "size":11},
