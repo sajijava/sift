@@ -21,6 +21,13 @@ var downloadAll = function(){
 	 })
 }
 
+var downloadFromList = function(symbollist){
+	var i = 1;
+	symbollist.forEach(function(symbol){
+					setTimeout(download,2500 * i++,symbol);
+			})
+}
+
 
 var download = function(symbol){
 	console.log("getting for "+symbol);
@@ -115,3 +122,4 @@ var getSymbols = function(data){
 */
 exports.download = download;
 exports.downloadAll = downloadAll;
+exports.downloadFromList = downloadFromList

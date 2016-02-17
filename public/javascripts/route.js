@@ -4,7 +4,8 @@ angular.module('app.sift.*', ['app.sift.dashboard'
                               ,'app.sift.screener'
                               ,'app.sift.watch'
                               ,'app.sift.aeWatchlist'
-                              ,'app.sift.test'
+                              ,'app.sift.errormessage'
+                              /*,'app.sift.test'*/
                               ]);
 
 angular.module('app.sift', ['ngRoute','ngMaterial','app.sift.*']).

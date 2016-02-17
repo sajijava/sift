@@ -30,9 +30,14 @@ exports.tableName = {
 	"RawTemplate":"rawtemplate",
 	"WatcherData":"watcherdata",
 	"WatcherTemplate":"watchertemplate",
-	"FinDataConsolidated":"findataconsolidated"
-	
+	"FinDataConsolidated":"findataconsolidated",
+	"SampleQuoteData":"samplequotedata"	
 }
+
+exports.sampleSymbols = ["AAPL","YHOO","GOOG","NFLX"];
+
+exports.dbconnectURL = 'mongodb://localhost:27017/sift'
+
 var dbCall = function(){
 	
 	return mongoClient.connectAsync('mongodb://localhost:27017/sift');
@@ -64,9 +69,11 @@ exports.getData = function(tablename,  filters, projection){
 
 }
 
-exports.errorCodes={
+exports.errorCode={
 	
-	"EmptyWatcherId":"1001"
+	"EmptyWatcherId":1001,
+	"NoDataFound":1002,
+	"success":0
 }
 
 

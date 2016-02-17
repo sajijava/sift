@@ -42,13 +42,13 @@ watch.controller('watchCtrl',['$scope','watchService','$mdDialog',function($scop
 		.then(function(w){
 			$scope.watchlist = w;
 			$scope.selectedWatch = w[0].id;
-			if (typeof w != 'undefined' && w.length > 0) {
+			/*if (typeof w != 'undefined' && w.length > 0) {
 				getData(w[0].id);
-			}
+			}*/
 		});
 		
-		$scope.$watch('selectedWatch', function(oldValue, newValue){
-			if (newValue) {
+		$scope.$watch('selectedWatch', function(newValue, oldValue){
+			if (!angular.isUndefined(newValue) && newValue.length > 0) {
 				getData(newValue);
 			}
 			});
@@ -57,7 +57,8 @@ watch.controller('watchCtrl',['$scope','watchService','$mdDialog',function($scop
 			watchService.getWatchListData(id)
 			.then(function(d){
 					console.log(d);
-					$scope.currentGrid = d;
+					$scope.errorCode = d.errorCode
+					$scope.currentGrid = d.data;
 					makeHeader();	
 			});
 		}
@@ -107,7 +108,10 @@ watch.controller('watchCtrl',['$scope','watchService','$mdDialog',function($scop
 					
 				$mdDialog.show(confirm)
 				.then(function() {
-								watchService.removeFromWatchListData($scope.selectedWatch,symbol);
+								watchService.removeFromWatchListData($scope.selectedWatch,symbol)
+								.then(function(){
+									getData($scope.selectedWatch);
+									})
 							},
 							function() {
 								;

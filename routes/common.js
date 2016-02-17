@@ -1,3 +1,76 @@
+var dao = require('./watcherDAO');
+var findataDAO = require('./findataDAO');
+var _ = require('lodash');
+var Promise = require('bluebird');
+var enums = require('./Enums');
+var fieldSrc = require('./fieldSource');
+
+
+var fetchQuote = function(dataObject){
+
+		console.log("GetData from Yahoo..."+dataObject.symbols);
+
+		return dao.getCurrentTemplate(dataObject.id)
+							.then(function(template){
+								
+								//console.log(template[0]);
+								var src = _.keys(template.sourceFlds)
+								dataObject['currTemplate'] = template;
+						
+								 return findataDAO.getDataFromYahoo(dataObject.symbols,src)
+								.then(function(d){
+									dataObject['quoteData'] = d;
+									return dataObject;	
+								});
+								
+							})
+	
+}
+
+var fetchFinancials = function(dataObject){
+	//console.log("get Statement Data"+JSON.stringify(dataObject.quoteData));
+
+	return new Promise(function(resolve, reject){
+			var src = _.keys(dataObject.currTemplate.sourceFlds)
+			var finAttributes = findataDAO.getFinStatmentFields(src)
+			//console.log(finAttributes);
+			
+			
+			
+			findataDAO.getFinStatment(_.keys(dataObject.quoteData))
+			.then(function(finStmts){
+					finStmts.forEach(function(finStmt){
+						//console.log(finStmt.companyname+','+finStmt.symbol)
+						var symbol = finStmt.symbol;
+						
+						if (!_.isUndefined(finStmt) && !_.isEmpty(finStmt.quarters)) {
+							_.keys(finAttributes).forEach(function(a){
+									//console.log(finStmt.quarters[0]);
+									if (finStmt.quarters[0][a] == null) {
+										dataObject.quoteData[symbol][a] = 0;
+									}else{
+										if (fieldSrc[a].type == enums.datatype.Currency) {
+											dataObject.quoteData[symbol][a] = finStmt.quarters[0][a];
+										}else {
+										dataObject.quoteData[symbol][a] = finStmt.quarters[0][a];
+									}
+								
+								}
+							})
+						}	
+						
+					});
+					
+					resolve(dataObject)
+			})
+			
+			
+	});
+
+}
+
+exports.fetchQuote = fetchQuote;
+exports.fetchFinancials = fetchFinancials;
 
 var fs = require("fs"), json;
 

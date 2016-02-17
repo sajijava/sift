@@ -19,4 +19,6 @@ var getAllSymbols = function(){
 	
 }
 
+
+
 exports.getAllSymbols = getAllSymbols;

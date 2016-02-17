@@ -4,6 +4,11 @@ var fieldSrc = require('./fieldSource');
 var _ = require('lodash');
 var assert = require('assert');
 var enums = require('./Enums');
+var rawTemplateModel = require('./model/userRawTemplateModel')
+var userTemplateModel = require('./model/userTemplateModel')
+var userTemplateDataModel = require('./model/userTemplateDataModel')
+
+
 
 var watcherTemplatesFileName= 'WatcherTemplates.json';
 
@@ -19,7 +24,9 @@ var loadData = function(){
 	watcherData = common.readAll(watcherDataFileName);
 	//console.log(watcherData)
 	watcherData.forEach(function(d){
-	//	persistWatcherData (d,{'id':'saji'});
+		d['templateId'] = '1';
+		var newData = new  userTemplateDataModel(d);
+	  newData.save(function (err) {if (err) console.log ('Error on save!')});
 	})
 }
 
@@ -45,14 +52,17 @@ var persistTemplate = function(template){
 	
 	console.log(template);
 	
-	enums.dbCall()
+	/*enums.dbCall()
 	.then(function(db){
 			db.collection(enums.tableName.RawTemplate)
 				.insertOneAsync(template);
 			
 			return db;
-	})
-	.then(function(db){
+	})*/
+	
+	var newTemplate = new rawTemplateModel(template);
+	newTemplate.save()
+	/*.then(function(db){
 			var watchertemp = buildWatcherTemplates(template);
 			
 			db.collection(enums.tableName.WatcherTemplate)
@@ -62,7 +72,7 @@ var persistTemplate = function(template){
 	})
 	.then(function(db){
 			db.close();
-		})
+		})*/
 	.catch(function(err){
 		throw err;
 	})
@@ -147,24 +157,27 @@ var parseFormula = function(formula, sourceFlds,inputFlds){
 }
 
 var getCurrentTemplate = function(templateId){
-	return enums.getData(enums.tableName.WatcherTemplate,{"templateId":templateId});
+	//return enums.getData(enums.tableName.WatcherTemplate,{"templateId":templateId});
+	return userTemplateModel.getOneTemplate(templateId)
 }
 
 var getAllTemplateName = function(callbackFn){
 	//loadData();
-	return enums.getData(enums.tableName.WatcherTemplate,{},{"templateId":1,"name":1,"_id":0});
+	return userTemplateModel.getAllTemplates();
 
 }
 
 var getSymbols = function(templateId){
 	
 	return new Promise(function(resolve, reject){
-				enums.getData(enums.tableName.WatcherData,{'id':templateId},{"data.symbol":1,"_id":0})
+				//enums.getData(enums.tableName.WatcherData,{'id':templateId},{"data.symbol":1,"_id":0})
+				userTemplateDataModel.getSymbolsForTemplate(templateId)
 				.then(function(d){
+					   console.log();
 						var symbolList = [];
 						
 						if (!_.isEmpty(d)) {
-							d[0].data.forEach(function(d){	symbolList.push(d.symbol)});
+							d.data.forEach(function(d){	symbolList.push(d.symbol)});
 							//console.log(symbolList);
 							resolve(symbolList);
 						}else{
@@ -178,116 +191,158 @@ var getSymbols = function(templateId){
 	})
 	
 }
-/*var getMaxTemplateId = function(){
-	loadTemplates();
+var getNextTemplateId =	 function(){
+
+
+	return enums.dbCall()
+	.then(function(db){
+			return db.collection(enums.tableName.WatcherTemplate)
+			.aggregateAsync([{$group:{_id:'','max':{$max:'$templateId'}}}])
+			.then(function(result){
+				console.log(result);
+				
+				if (!_.isUndefined(result[0].max)) {
+					var maxId = +result[0].max;
+					return (maxId + 1).toString();
+				}else{
+					return "1";
+				}
+			})
+		})
 	
-	var maxId = 0;
-	for (temp in watcher){
-		var tempId = +temp
-			if (tempId > maxId) {
-				maxId = tempId;
-			}
-	}
-	return maxId;
-	
-}*/
+}
 // saved data for the template
 var getCurrentTemplateData = function(templateId){
 	
-	return enums.getData(enums.tableName.WatcherData,{'id':templateId})
-	.then(function(d){
-		return d[0];
-	})
+	console.log(templateId)
+	//return enums.getData(enums.tableName.WatcherData,{'id':templateId})
+	return userTemplateDataModel.getDataForTemplate(templateId);
 
 }
 
 
 var updateWatcherData = function(id, updatedData){
-	//loadData();
-	return new Promise(function(resolve, reject){
-										enums.dbCall()
-										.then(function(db){
-												db.collection(enums.tableName.WatcherData)
-												.updateOne({'id':id},{$set:{'data':updatedData}})
-												return db;	
-										})
-										.then(function(db){
-												db.close();
-												resolve();
-											})
-										.catch(function(err){
-											throw err;
-										})
+	
+	
+		return new Promise(function(resolve, reject){
+			
+										var filter = {'templateId':id};
+										userTemplateDataModel.findOneAndUpdate(filter,{$set:{'data':updatedData}},function(err, val){
+												if (err) {
+													throw err;
+												}else{
+													resolve(val);
+												}
+											});
+										
 						})
-
 }
 
 var addNewSymbols = function(id, symbollist){
 
-		return new Promise(function(resolve, reject){
-										enums.dbCall()
-										.then(function(db){
-													db.collection(enums.tableName.WatcherData)
-													.updateOne(
-																{'id':id},
-																{$addToSet:{'data':{$each:symbollist}}}
-																);
-													return db;
-	
-										})
-										.then(function(db){
-												console.log("updated "+symbollist+ ' for '+id);
-												db.close();
-												resolve();
-											})
-										.catch(function(err){
-												reject();
-											throw err;
-										})
+	return new Promise(function(resolve, reject){
+				
+				userTemplateModel.getOneTemplate(id)
+					.then(function(wkspc){
+						console.log("then 1")
+						return wkspc.template;
+					})		
+					.then(function(template){
+						console.log("then 2")
+							var symbols = [];
+				
+							
+							var newTemplateObj = {}
+							template.forEach(function(tl){
+									if (tl.source == enums.datasource.Input) {
+										newTemplateObj[tl.name] = "";
+									}	
+								})
+				
+							if (_.isArray(symbollist)) {
+								
+								symbols = symbollist.map(function(temp){
+																												
+																												var newTemp = _.clone(newTemplateObj);
+																												newTemp.symbol = temp;
+																												return newTemp;
+																											})
+				
+							}else{
+				
+									var newTemp = _.clone(newTemplateObj);
+									newTemp.symbol = symbollist;
+									symbols.push(newTemp);
+									
+							}
+				
+							userTemplateDataModel.getDataForTemplate(id)
+							.then(function(d){
+								
+								
+								
+										d.data.push(symbols[0]);
+										d.save();
+										resolve(true)
+								})
+							
 						})
+					.catch(function(err){
+						console.log(err)
+						revoke(false)
+					})				
+		})
+  
+	
+
 }
 
 
 
-/*
+
 var removeFromWatcherData = function(id, symbol)
 {
 	console.log("removing "+symbol+" from "+id);
-	var watcher = getCurrentTemplateData(id).data;
-	for(var i = 0; i < watcher.length; i++){
-		if (watcher[i].symbol == symbol) {
-			watcher.splice(i,1);
-			break;
+
+	return userTemplateDataModel.getDataForTemplate(id)
+	.then(function(template){
+		var currData = template.data;
+		for(var i = 0; i < currData.length; i++){
+			if (currData[i].symbol == symbol) {
+				currData.splice(i,1);
+				break;
+			}
 		}
-	}
-	updateWatcherData(id, watcher);
-	
+		return updateWatcherData(id,currData);
+	})
+
 }
 
 
 var getRawTemplate = function(templateId){
-	var watcherTemplates = common.readAll(watcherTemplatesFileName);
-	var template = {}
-	for(idx in watcherTemplates){
-		if (watcherTemplates[idx].templateId == templateId) {
-			template = watcherTemplates[idx];
-			break;
-		}
-	}
-	return template;
+	return enums.dbCall()
+					.then(function(db){
+							return db.collection(enums.tablename.RawTemplate)
+							.findAsync({'templateId':templateId})
+							.then(function(cursor){
+								return cursor.toArrayAsync();
+								})
+							
+						})
+
 }
-*/
+
 
 
 exports.getCurrentTemplateData = getCurrentTemplateData;
 exports.getCurrentTemplate = getCurrentTemplate;
 exports.getAllTemplateName = getAllTemplateName
 exports.updateWatcherData = updateWatcherData
-//exports.removeFromWatcherData = removeFromWatcherData;
-//exports.buildMetaData = buildMetaData;
-//exports.getMaxTemplateId = getMaxTemplateId;
-exports.persistTemplate = persistTemplate;
-exports.persistWatcherData = persistWatcherData;
-//exports.getRawTemplate = getRawTemplate;
+exports.removeFromWatcherData = removeFromWatcherData;
+exports.buildMetaData = buildMetaData;
+//exports.getNextTemplateId = getNextTemplateId;
+//exports.persistTemplate = persistTemplate;
+//exports.persistWatcherData = persistWatcherData;
+exports.getRawTemplate = getRawTemplate;
 exports.getSymbols = getSymbols
 exports.addNewSymbols = addNewSymbols

@@ -3,9 +3,11 @@ var fieldSrc = require('./fieldSource');
 var dao = require('./watcherDAO');
 var findataDAO = require('./findataDAO');
 
+
 var _ = require('lodash');
 var enums = require('./Enums');
 var Debug = require('debug');
+var common = require('./common');
 
 var MILLION = 1000000;
 
@@ -19,6 +21,7 @@ var getWatcherList = function(req, res){
 		
 		dao.getAllTemplateName()
 		.then(function(rows){
+			console.log(rows);
 			rows.forEach(function(d){
 					watcherNames.push({"id":d.templateId,"name":d.name});
 				})
@@ -43,7 +46,7 @@ var getWatcherData = function(req, res){
 										return dataObject;
 								})
 			}
-			
+/*			
 	var fetchQuote = function(dataObject){
 
 			console.log("GetData from Yahoo..."+dataObject.symbols);
@@ -62,8 +65,8 @@ var getWatcherData = function(req, res){
 								})
 		
 	}
-
-	
+*/
+	/*
 	var fetchFinancials = function(dataObject){
 		//console.log("get Statement Data"+JSON.stringify(dataObject.quoteData));
 
@@ -105,18 +108,18 @@ var getWatcherData = function(req, res){
 		});
 
 	}
-	
+	*/
 	var prepareForUI = function(dataObject){
-		//console.log("prepare for UI"+JSON.stringify(dataObject.quoteData));
+		console.log("prepare for UI");//+JSON.stringify(dataObject.quoteData));
 		
 		var table = [];
 		dao.getCurrentTemplateData(dataObject.id)
 		.then(function(d){
-				//console.log(d[0]);
+				//console.log(JSON.stringify(d));
 				var currentTemplate = d;
 				var template = dataObject.currTemplate.template;
 				var formatting = dataObject.currTemplate.formatting;
-				//console.log(dataObject.currTemplate);
+				//console.log(template);
 				for (idx in currentTemplate.data) {
 						////console.log("watcher " +watcher)
 						var data = currentTemplate.data[idx];
@@ -125,14 +128,15 @@ var getWatcherData = function(req, res){
 							findataDAO.mergeMap(data, mktData);
 						}
 						
-						//console.log(data);
+						//console.log(data)
+						//console.log(template);
 						var row = findataDAO.createRow(template,data,formatting)
 						console.log("**************");
-						//console.log(row);
+						//console.log(row[0][0].data);
 						table.push(row);		
 					}
-				//onsole.log(table);	
-				res.json(table);			
+				//console.log(table);	
+				res.json({"errorCode":enums.errorCode.success,"data":table});			
 			})
 		
 	}
@@ -146,86 +150,15 @@ var getWatcherData = function(req, res){
 		dataObject['id'] = id;
 
 		return fetchSymbols(dataObject)
-					.then(fetchQuote)
-					.then(fetchFinancials)
+					.then(common.fetchQuote)
+					.then(common.fetchFinancials)
 					.then(prepareForUI)
+					.catch(function(){
+						res.json({"errorCode":enums.errorCode.NoDataFound,"data":[]});			
+					})
 	 
 	}
-	
-	
 
-
-	
-	//var currentTemplate = dao.getCurrentTemplateData(id);
-	/*
-	//console.log("***"+id);
-	return new Promise(function(resolve, reject){
-				var currentTemplate = da//o.getCurrentTemplateData(id);
-				////console.log(currentTemplate);
-				resolve(getSymbols(currentTemplate.data))
-		}).then(function(symbols){ // get Quote data from Yahoo
-				//console.log("GetData from Yahoo...");
-				////console.log(symbols);
-				var src = dao.getCurrentTemplate(id).sourceFlds
-				return findataDAO.getDataFromYahoo(symbols,src)
-
-		}).then(function(snapshot){ //relabel yahoo data
-				//console.log("Relabel yahoo data");
-				// get all source field from template e.g. close: {},
-				var src = dao.getCurrentTemplate(id).sourceFlds
-				////console.log(src);
-				var attributes = findataDAO.getYahooKeys(src)
-				//.log(attributes);
-				////console.log(snapshot);
-				return {'sourceData':findataDAO.mapQuoteSnapShot(snapshot,attributes),'sourceFields':src};
-		}).then(function(data){ // get financial Data
-				console.log("get Statement Data");
-
-				console.log(data.sourceFields);
-				var finAttributes = findataDAO.getFinStatmentFields(data.sourceFields)
-				console.log(finAttributes);
-				for(key in data.sourceData){
-					var finStmt = findataDAO.readFinStatment(key);
-					if (!_.isUndefined(finStmt)) {
-						_.keys(finAttributes).forEach(function(a){
-								if (finStmt.quarters[0][a] == null) {
-									data.sourceData[key][a] = 0;
-								}else{
-									if (fieldSrc[a].type == enums.datatype.Currency) {
-										data.sourceData[key][a] = finStmt.quarters[0][a]/MILLION;
-									}else {
-										data.sourceData[key][a] = finStmt.quarters[0][a];
-									}
-									
-								}
-							})
-					}
-				}
-////console.log(data.sourceData);
-				return data.sourceData;
-		}).then(function(sourceData){
-				//console.log("build data grid");
-		//		//console.log(sourceData);
-				var table = [];
-				var currentTemplate = dao.getCurrentTemplateData(id);
-				var template = dao.getCurrentTemplate(id).template;
-				var formatting = dao.getCurrentTemplate(id).formatting;
-				for (idx in currentTemplate.data) {
-						////console.log("watcher " +watcher)
-						var data = currentTemplate.data[idx];
-						findataDAO.mergeMap(data, sourceData);
-						//console.log(data);
-						var row = findataDAO.createRow(template,data,formatting)
-						////console.log("**************");
-						////console.log(row);
-						table.push(row);		
-					}
-				////console.log(table);	
-				res.json(table);				
-		})
-		
-		;
-		*/
 }
 
 
@@ -263,37 +196,11 @@ var addNewWatcherData = function(req, res){
 
 	if (!_.isUndefined(symbols) ) {
 		var symbArr = symbols.split(",");
-	}	
-	console.log("***"+symbols);
-	dao.getCurrentTemplate(id)
-	.then(function(t){
-			//console.log(t[0].template)
-			var newTemplateObj = {}
-			
-			t[0].template.forEach(function(tl){
-					if (tl.source == enums.datasource.Input) {
-						newTemplateObj[tl.name] = "";
-					}
-			});
-		
-			if (symbArr.length > 0){
-					var newRows = []
-					symbArr.forEach(function(d){
-							var newRow = _.clone(newTemplateObj);
-							newRow.symbol =  d
-							newRows.push(newRow);
-					})
-			}
-			
-			console.log(newRows);
-			dao.addNewSymbols(id,newRows)
-			.then(function(){
-				res.json({"success":"true"});		
-			})
-			
-	})
-
-	
+		dao.addNewSymbols(id,symbArr)
+		.then(function(){
+			res.json({"success":"true"});		
+		})
+	}
 }
 var saveWatcherData = function(req, res){
 	var content = req.body;
@@ -312,16 +219,23 @@ var saveWatcherData = function(req, res){
 		}
 		updatedData.push(updatedRow);
 	}
-	////console.log(updatedData);
-	dao.updateWatcherData(id,updatedData)
-	.then(function(){res.json({"success":"true"});});
-	
+	//console.log(updatedData);
+	if (!_.isEmpty(updatedData)) {
+
+			dao.updateWatcherData(id,updatedData)
+			.then(function(val){
+					res.json({"success":"true"});
+			});
+	}
 	
 }
 var removeFromWatcherData = function(req, res){
 	var id = req.params.watcherId;
 	var symbol = req.params.symbol;
-	var response = dao.removeFromWatcherData(id, symbol);
+	dao.removeFromWatcherData(id, symbol).
+	then(function(){
+		res.json({"success":"true"})
+	})
 	
 	
 }

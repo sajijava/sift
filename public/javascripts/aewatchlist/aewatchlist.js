@@ -45,7 +45,7 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
 					}
 				}
 				
-				getData();
+				//getData();
 			});
 
 	}
@@ -308,9 +308,6 @@ aewatchlist.directive('expItem',function(){
 
 aewatchlist.directive('draggable',function(){
 		return {
-			scope:{
-				data:'='
-			},
 			link:function(scope, element,attrs){
 			
 			var el = element[0];

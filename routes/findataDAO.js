@@ -78,13 +78,17 @@ var mapQuoteSnapShot = function(snapshot,attributes){
 }
 var createRow = function(template, data,formatting){
 
-	var row = _.clone(template,true);
+	var row = _.clone(template.toObject());
 
-	//console.log(data);
+	//console.log("row "+JSON.stringify(row));
+	//console.log(Object.prototype.toString.call(row[0])+row[0]);
+	//console.log(row);
 	for (item in row) {
+		//console.log(row[item].name);
 			
 		if (_.isUndefined(row[item].formula)) {
 				row[item]["data"] = data[row[item].name];
+		//console.log(row[item]	)
 		}else if (row[item].type == "D") {
 				
 		}else{
@@ -93,14 +97,16 @@ var createRow = function(template, data,formatting){
 					
 					var res = round(math.eval(row[item].formula, data));
 					row[item]["data"] = (isNaN(res))?0:res;
+					//console.log(JSON.stringify(row[item]))
 				}catch(e)
 				{
 					row[item]["data"] = 0;
 					console.error(e);	
 				}
+				//so the calculated value is set back in data to be reused
 				data[row[item].name] = row[item]["data"];
 		}
-		
+		//console.log(row[item].data);
 		// apply column formatting
 		if (!_.isUndefined(formatting[row[item].name])) {
 			var conditions = formatting[row[item].name];
@@ -115,6 +121,7 @@ var createRow = function(template, data,formatting){
 		if (_.isUndefined(row[item]["data"])) {
 			row[item]["data"] = "";
 		}
+		
 	}
 	//console.log(formatting["row"]);
 	//console.log(_.isUndefined(formatting["row"]));
@@ -158,7 +165,7 @@ var round = function(digit)
 }
 
 var createFinStatment = function(symbol, data){
-	
+	console.log("creating fin statement "+symbol);
 	if (!_.isUndefined(data)) {
 		
 		enums.dbCall()
@@ -193,6 +200,43 @@ var fetchData = function(symbol, callbkFn){
 	var completeFileName = statmtFolder+symbol+'.json'
 	return common.createIfNotFileExist(completeFileName,callbkFn);
 }*/
+
+var getSampleQuoteData = function(){
+	
+	var srcFlds = [];
+	_.keys(fieldSrc).forEach(function(f){
+			if (fieldSrc[f].source == enums.datasource.Quote) {
+				srcFlds.push(f)
+			}
+		})
+	
+	
+	return enums.getData(enums.tableName.SampleQuoteData)
+				.then(function(data){
+				if (_.isUndefined(data) || _.isEmpty(data)) {
+					//get Data
+					return getDataFromYahoo(enums.sampleSymbols,srcFlds)
+								.then(function(d){
+									// if data returned persist it.
+									if (!_.isUndefined(d) && !_.isEmpty(d)) {
+										enums.dbCall()
+										.then(function(db){
+												db.collection(enums.tableName.SampleQuoteData)
+												.insertOneAsync(d);
+											})
+										return d;
+									}else{
+										return null;
+									}
+								})
+				}else{
+					return data;
+				}
+				});
+
+         
+}
+
 exports.createRow = createRow;
 //exports.getYahooKeys = getYahooKeys;
 exports.getFinStatmentFields = getFinStatmentFields;
@@ -202,3 +246,4 @@ exports.mergeMap = mergeMap;
 exports.createFinStatment = createFinStatment;
 exports.getFinStatment = getFinStatment;
 //exports.fetchData = fetchData;
+exports.getSampleQuoteData = getSampleQuoteData;

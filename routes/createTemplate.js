@@ -29,55 +29,80 @@ var getTemplateObject = function(req, res){
 	console.log("get template for id "+id);
 	var template = {};
 	if (!_.isUndefined(id) && id != 'undefined' && _.trim(id).length > 0){
-		template = dao.getRawTemplate(id);
+		dao.getRawTemplate(id)
+		.then(function(data){
+				res.json(data);		
+			});
 	}else{
-		template = { "id":dao.getMaxTemplateId()+1
-									,"name":""
-									,"table":[{"header":"Symbol","name":"symbol","order":0,"source":"I", "size":6}]
-									,"formatting":{}
-								};
+		
+		dao.getNextTemplateId()
+		.then(function(nextId){
+				var template = { "templateId":nextId
+											,"name":""
+											,"table":[{"header":"Symbol","name":"symbol","order":0,"source":"I", "size":6}]
+											,"formatting":{}
+										};
+										
+				console.log(template);
+				
+				res.json(template);
+			
+			});
 	}
-	
-	res.json(template);
 }
 
 var getSampleData = function(req,res){
-	var sampleSymbols = ["AAPL","YHOO","GOOG","NFLX"];
 	var template = req.body;
 	var templateMetaData = dao.buildMetaData(template.table);
 	console.log("**************** getSampleData **************");
 	console.log(template);
 	console.log(templateMetaData);
 	
+	
+	
+	var getSampleQuoteData = function(){
+			
+	}
+	
+	
 	return new Promise(function(resolve, reject){
-				var src = templateMetaData.sourceFlds
-				var returnObj = {};
-				if (!_.isEmpty(src)) {
-					returnObj = findataDAO.getDataFromYahoo(sampleSymbols,src);
-				}
-				 
-				resolve(returnObj);
+				var quoteData = findataDAO.getSampleQuoteData();
 
-		}).then(function(snapshot){ //relabel yahoo data
-				console.log("second then");
-				var src = templateMetaData.sourceFlds
-				var attributes = findataDAO.getYahooKeys(src)
-				return findataDAO.mapQuoteSnapShot(snapshot,attributes);
+				resolve(quoteData);
 
+		}).then(function(quoteData){ //relabel yahoo data = 
+				console.log("second then ");
+				//console.log(_.keys(quoteData[0]))
+				return findataDAO.getFinStatment(_.keys(quoteData[0]))
+				.then(function(finStmts){
+						finStmts.forEach(function(finStmt){
+								
+								console.log(_.keys(finStmt.quarters[0]));
+								_.keys(finStmt.quarters[0]).forEach(function(d){
+												console.log(d);
+												quoteData[0][finStmt.symbol][d] = finStmt.quarters[0][d];
+										})
+								
+							});
+						//console.log(quoteData);
+						return quoteData;
+					})
+				
 		}).then(function(sourceData){
 				console.log("Third then");
 				//console.log(sourceData);
 				var table = [];
 				var currentTemplate = templateMetaData;
 				var formatting = template.formatting;
-				for (idx in sampleSymbols) {
+				for (idx in enums.sampleSymbols) {
 						//console.log("watcher " +watcher)
-						var data = {"symbol":sampleSymbols[idx]};
-						findataDAO.mergeMap(data, sourceData);
-		//				console.log(data);
+						var data = {"symbol":enums.sampleSymbols[idx]};
+					//	console.log(data);
+						findataDAO.mergeMap(data, sourceData[0][enums.sampleSymbols[idx]]);
+						//console.log(data);
 						var row = findataDAO.createRow(template.table,data,formatting)
 						//console.log("**************");
-			//			console.log(row);
+						//console.log(row);
 						table.push(row);		
 					}
 					
