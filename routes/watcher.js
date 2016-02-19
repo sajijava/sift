@@ -115,7 +115,7 @@ var getWatcherData = function(req, res){
 		var table = [];
 		dao.getCurrentTemplateData(dataObject.id)
 		.then(function(d){
-				//console.log(JSON.stringify(d));
+				console.log(JSON.stringify(d));
 				var currentTemplate = d;
 				var template = dataObject.currTemplate.template;
 				var formatting = dataObject.currTemplate.formatting;
@@ -130,7 +130,7 @@ var getWatcherData = function(req, res){
 						
 						//console.log(data)
 						//console.log(template);
-						var row = findataDAO.createRow(template,data,formatting)
+						var row = findataDAO.createRow(template.toObject(),data,formatting)
 						console.log("**************");
 						//console.log(row[0][0].data);
 						table.push(row);		

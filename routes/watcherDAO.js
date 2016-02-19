@@ -59,9 +59,17 @@ var persistTemplate = function(template){
 			
 			return db;
 	})*/
+	template.userId = 'saji';
+	/*var newTemplate = new rawTemplateModel(template);
+	newTemplate.save()*/
+	try{
+	var newRawTemplate = buildWatcherTemplates(template);
+	console.log(newRawTemplate);
+	var newUserTemplate = new userTemplateModel(newRawTemplate);
+	newUserTemplate.save(function(err){
+			console.log(err)
+		});
 	
-	var newTemplate = new rawTemplateModel(template);
-	newTemplate.save()
 	/*.then(function(db){
 			var watchertemp = buildWatcherTemplates(template);
 			
@@ -73,9 +81,10 @@ var persistTemplate = function(template){
 	.then(function(db){
 			db.close();
 		})*/
-	.catch(function(err){
-		throw err;
-	})
+	
+	}catch(err){
+		console.log(err);
+	}
 }
 
 var buildWatcherTemplates = function(rawTemplate){
@@ -89,7 +98,8 @@ var buildWatcherTemplates = function(rawTemplate){
 							"template":rawTemplate.table,
 							"formatting":rawTemplate.formatting,
 							"header":metaData.header,// only the header
-							"sourceFlds":metaData.sourceFlds // find all source fields
+							"sourceFlds":metaData.sourceFlds, // find all source fields
+							"userId":rawTemplate.userId	
 						};
 	return watcher;
 }
@@ -194,6 +204,21 @@ var getSymbols = function(templateId){
 var getNextTemplateId =	 function(){
 
 
+	return userTemplateModel.getMaxTemplateId()
+	.then(function(maxId){
+		console.log(JSON.stringify(maxId));
+			var currMaxId = +maxId[0].templateId;
+			console.log(currMaxId)
+			if (!_.isUndefined(currMaxId)) {
+					return currMaxId + 1;
+				}else{
+					return 1;
+				}
+			
+			
+		})
+	
+/*
 	return enums.dbCall()
 	.then(function(db){
 			return db.collection(enums.tableName.WatcherTemplate)
@@ -208,7 +233,8 @@ var getNextTemplateId =	 function(){
 					return "1";
 				}
 			})
-		})
+		})*/
+
 	
 }
 // saved data for the template
@@ -248,7 +274,7 @@ var addNewSymbols = function(id, symbollist){
 						return wkspc.template;
 					})		
 					.then(function(template){
-						console.log("then 2")
+						console.log("then 2" + template)
 							var symbols = [];
 				
 							
@@ -275,14 +301,31 @@ var addNewSymbols = function(id, symbollist){
 									symbols.push(newTemp);
 									
 							}
-				
+						
 							userTemplateDataModel.getDataForTemplate(id)
 							.then(function(d){
 								
+										if (d == null|| _.isUndefined(d)) {
+											console.log("new document")
+												var newData = new userTemplateDataModel();
+												newData.templateId = id;
+												newData.userId = 'Saji'
+												symbols.forEach(function(sy){
+													console.log("adding " +sy)
+														newData.data.push(sy)
+													})
+												newData.save();
+												
+										}else{
+											console.log("existing document")
+												symbols.forEach(function(sy){
+													console.log("adding " +sy)
+														d.data.push(sy)
+													})
+												d.save();
+											
+										}
 								
-								
-										d.data.push(symbols[0]);
-										d.save();
 										resolve(true)
 								})
 							
@@ -320,7 +363,9 @@ var removeFromWatcherData = function(id, symbol)
 
 
 var getRawTemplate = function(templateId){
-	return enums.dbCall()
+	
+	
+	/*return enums.dbCall()
 					.then(function(db){
 							return db.collection(enums.tablename.RawTemplate)
 							.findAsync({'templateId':templateId})
@@ -328,7 +373,7 @@ var getRawTemplate = function(templateId){
 								return cursor.toArrayAsync();
 								})
 							
-						})
+						})*/
 
 }
 
@@ -340,8 +385,8 @@ exports.getAllTemplateName = getAllTemplateName
 exports.updateWatcherData = updateWatcherData
 exports.removeFromWatcherData = removeFromWatcherData;
 exports.buildMetaData = buildMetaData;
-//exports.getNextTemplateId = getNextTemplateId;
-//exports.persistTemplate = persistTemplate;
+exports.getNextTemplateId = getNextTemplateId;
+exports.persistTemplate = persistTemplate;
 //exports.persistWatcherData = persistWatcherData;
 exports.getRawTemplate = getRawTemplate;
 exports.getSymbols = getSymbols

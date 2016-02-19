@@ -69,6 +69,7 @@ aewatchlist.controller('aeWatchlistCtrl',['$scope','aeWatchlistService','$mdDial
 									"order":$scope.aeWatchlistForm.table.length - 1,
 									"type":src.type,
 									"size":src.size,
+									"source":src.source,
 									"align":src.align};
 			
 			$scope.aeWatchlistForm.table.push(row);

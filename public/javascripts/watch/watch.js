@@ -59,6 +59,7 @@ watch.controller('watchCtrl',['$scope','watchService','$mdDialog',function($scop
 					console.log(d);
 					$scope.errorCode = d.errorCode
 					$scope.currentGrid = d.data;
+					$scope.header = [];
 					makeHeader();	
 			});
 		}

@@ -57,13 +57,7 @@ var getSampleData = function(req,res){
 	console.log("**************** getSampleData **************");
 	console.log(template);
 	console.log(templateMetaData);
-	
-	
-	
-	var getSampleQuoteData = function(){
-			
-	}
-	
+
 	
 	return new Promise(function(resolve, reject){
 				var quoteData = findataDAO.getSampleQuoteData();
@@ -77,9 +71,9 @@ var getSampleData = function(req,res){
 				.then(function(finStmts){
 						finStmts.forEach(function(finStmt){
 								
-								console.log(_.keys(finStmt.quarters[0]));
+								//console.log(_.keys(finStmt.quarters[0]));
 								_.keys(finStmt.quarters[0]).forEach(function(d){
-												console.log(d);
+												//console.log(d);
 												quoteData[0][finStmt.symbol][d] = finStmt.quarters[0][d];
 										})
 								
@@ -93,20 +87,27 @@ var getSampleData = function(req,res){
 				//console.log(sourceData);
 				var table = [];
 				var currentTemplate = templateMetaData;
-				var formatting = template.formatting;
+				
+				var formatting = {};
+				if(!_.isUndefined(template.formatting)){
+					formatting = template.formatting;
+				}
+				
 				for (idx in enums.sampleSymbols) {
 						//console.log("watcher " +watcher)
 						var data = {"symbol":enums.sampleSymbols[idx]};
 					//	console.log(data);
 						findataDAO.mergeMap(data, sourceData[0][enums.sampleSymbols[idx]]);
 						//console.log(data);
-						var row = findataDAO.createRow(template.table,data,formatting)
-						//console.log("**************");
-						//console.log(row);
-						table.push(row);		
+						var row = {};
+						row = findataDAO.createRow(template.table,data,formatting)
+						console.log("**************");
+						//console.log(row === table[0]);
+						table.push(row);
+						console.log(table);		
 					}
 					
-			//	console.log(table);	
+				//console.log(table);	
 				res.json(table);				
 		});
 	
@@ -118,7 +119,7 @@ var getDataType = function(req, res){
 
 var saveTemplate = function(req, res){
 	console.log("prepare to save");
-	console.log(req.body);
+	//console.log(req.body);
 	dao.persistTemplate(req.body);
 	res.json({success:true});
 }

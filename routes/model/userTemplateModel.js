@@ -20,7 +20,7 @@ var UserTemplateSchema = new Schema({
     header: [{
         name: {type:String,required:true},
         field: {type:String,required:true},
-        cellFilter: {type:String,required:true},
+        cellFilter: {type:String,required:false},
         width: {type:Number,required:true}
       }],
     sourceFlds: Schema.Types.Mixed,
@@ -39,7 +39,9 @@ UserTemplateSchema.statics.getOneTemplate = function(templateId){
 		
 }
 
-
+UserTemplateSchema.statics.getMaxTemplateId = function(){
+		return this.find().sort({'templateId':-1}).select({'templateId':1}).limit(1).exec();
+}
 
 
 module.exports = mongoose.model('UserTemplate',UserTemplateSchema,'UserTemplate');

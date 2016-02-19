@@ -78,8 +78,7 @@ var mapQuoteSnapShot = function(snapshot,attributes){
 }
 var createRow = function(template, data,formatting){
 
-	var row = _.clone(template.toObject());
-
+	var row = _.clone(template);
 	//console.log("row "+JSON.stringify(row));
 	//console.log(Object.prototype.toString.call(row[0])+row[0]);
 	//console.log(row);
@@ -108,12 +107,14 @@ var createRow = function(template, data,formatting){
 		}
 		//console.log(row[item].data);
 		// apply column formatting
-		if (!_.isUndefined(formatting[row[item].name])) {
-			var conditions = formatting[row[item].name];
-			for(condIdx in conditions){
-				var result = math.eval(conditions[condIdx].cond, data);
-				if (result) {
-					row[item]["style"] = conditions[condIdx].style;
+		if (!_.isUndefined(formatting)) {
+			if (!_.isUndefined(formatting[row[item].name])) {
+				var conditions = formatting[row[item].name];
+				for(condIdx in conditions){
+					var result = math.eval(conditions[condIdx].cond, data);
+					if (result) {
+						row[item]["style"] = conditions[condIdx].style;
+					}
 				}
 			}
 		}
@@ -126,17 +127,19 @@ var createRow = function(template, data,formatting){
 	//console.log(formatting["row"]);
 	//console.log(_.isUndefined(formatting["row"]));
 	// apply row formatting
-	if (!_.isUndefined(formatting["row"])) {
-		var conditions = formatting["row"];
-		for(condIdx in conditions){
-			var result = 0;
-			try{
-				result = math.eval(conditions[condIdx].cond, data);
-			}catch(e){
-				console.log(e);
-			}
-			if (result) {
-				row[0]["rowStyle"] = conditions[condIdx].style;
+	if (!_.isUndefined(formatting)) {
+		if (!_.isUndefined(formatting["row"])) {
+			var conditions = formatting["row"];
+			for(condIdx in conditions){
+				var result = 0;
+				try{
+					result = math.eval(conditions[condIdx].cond, data);
+				}catch(e){
+					console.log(e);
+				}
+				if (result) {
+					row[0]["rowStyle"] = conditions[condIdx].style;
+				}
 			}
 		}
 	}

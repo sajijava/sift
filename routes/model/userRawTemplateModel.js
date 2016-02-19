@@ -19,4 +19,4 @@ var UserRawTemplateSchema = new Schema({
 		updatedTime:{type: Date, default: Date.now }
 	})
 
-exports.UserRawTemplate = mongoose.model('UserRawTemplate',UserRawTemplateSchema)
+module.exports = mongoose.model('UserRawTemplate',UserRawTemplateSchema,'UserRawTemplate')
