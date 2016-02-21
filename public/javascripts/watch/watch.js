@@ -8,6 +8,7 @@ watch.controller('watchCtrl',['$scope','watchService','$mdDialog',function($scop
 		$scope.addSymbol = "";
 		$scope.header = [];
 		$scope.isEditable = false;
+		$scope.isLoading = false;
 		
 
 
@@ -49,17 +50,23 @@ watch.controller('watchCtrl',['$scope','watchService','$mdDialog',function($scop
 		
 		$scope.$watch('selectedWatch', function(newValue, oldValue){
 			if (!angular.isUndefined(newValue) && newValue.length > 0) {
+				$scope.errorCode = ''
+				$scope.currentGrid = [];
+				$scope.header = [];
+				$scope.isLoading = true;
 				getData(newValue);
 			}
 			});
 
 		var getData = function(id){
+				
 			watchService.getWatchListData(id)
 			.then(function(d){
 					console.log(d);
 					$scope.errorCode = d.errorCode
 					$scope.currentGrid = d.data;
 					$scope.header = [];
+					$scope.isLoading = false;
 					makeHeader();	
 			});
 		}
