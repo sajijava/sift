@@ -6,67 +6,70 @@
 	background-color: #0f0;
 }
 </style>
-
-<div layout="row">
-	<div flex="50">
-		<md-content layout-padding>
-				<md-input-container class="md-block">
-					<label>Name</label>
-					<input  required name="Name" ng-model="aeWatchlistForm.name">
-				</md-input-container>
-				<md-input-container class="md-block">
-					<label>Description</label>
-					<input  required name="description" ng-model="aeWatchlistForm.desc">
-				</md-input-container>
-		</md-content>
-	</div>
-</div>
-
-
-<div layout="row">
-		
-	<div flex="20">
-		<div layout="column">
-			<div droppable  drop="removeColumn">
-				<div ng-repeat="item in sourceFields"  draggable index="sourceFields:{{$index}}" ng-show="item.show">{{item.desc}}</div>
-			</div>
-		</div>
-	</div>	
-	<div>
-		<a ng-click="addInputField()">Add Input Field</a>
-		<a ng-click="addFormulaField()">Add a Formula</a>
-	</div>
+<div class="addedit">
 	<div layout="row">
-		<div class="thumbnail"  droppable drop="addColumn" >
-			<div id="viewGrid" class="w-grid">
-				<table class="w-grid-tab" border="0">
-					<thead>
-						<tr>
-							<td><div>Symbol</div></td>
-							<td ng-repeat="col in header">
-									<div draggable index="{{col.name}}">{{col.header}}</div>
-							</td>
-						</tr>
-					</thead>
-					<tbody></tbody>
-					<tr ng-repeat="row in sampleGrid" style="{{row[0].rowStyle}}">
-						<td ng-repeat="col in row" ng-class="textAlign(col)" style="{{col.style}}">
-							<span ng-switch="col.type">
-								<span ng-switch-when="C">${{col.data}}</span>
-								<span ng-switch-when="P">{{col.data}}%</span>
-								<span ng-switch-when="D">{{col.data}}</span>
-								<span ng-switch-when="F">{{col.data}}</span>
-								<span ng-switch-default>{{col.data}}</span>
-							</span>
-						</td>
-					</tr>
-				</table>
+		<div flex="50">
+			<md-content layout-padding>
+					<md-input-container class="md-block">
+						<label>Name</label>
+						<input  required name="Name" ng-model="aeWatchlistForm.name">
+					</md-input-container>
+					<md-input-container class="md-block">
+						<label>Description</label>
+						<input  required name="description" ng-model="aeWatchlistForm.desc">
+					</md-input-container>
+			</md-content>
+		</div>
+	</div>
+	
+	
+	<div layout="row">
+			
+		<div flex="20" class="itemList">
+			<div layout="column" >
+				<div droppable  drop="removeColumn">
+					<div ng-repeat="item in sourceFields"  draggable index="sourceFields:{{$index}}" ng-show="item.show">{{item.desc}}</div>
+				</div>
+			</div>
+		</div>
+		<div flex="grow" layout="column" class="tbuilder">
+			<div layout="row" class="icons">
+				<a ng-click="addInputField()">Add Input Field</a>
+				<a ng-click="addFormulaField()">Add a Formula</a>
+			</div>
+			<div layout="row">
+				<div class="thumbnail"  droppable drop="addColumn" >
+					<div id="viewGrid" class="w-grid">
+						<table class="w-grid-tab" border="0">
+							<thead>
+								<tr>
+									<td><div>Symbol</div></td>
+									<td ng-repeat="col in header">
+											<div draggable index="{{col.name}}">{{col.header}}</div>
+									</td>
+								</tr>
+							</thead>
+							<tbody></tbody>
+							<tr ng-repeat="row in sampleGrid" style="{{row[0].rowStyle}}">
+								<td ng-repeat="col in row" ng-class="textAlign(col)" style="{{col.style}}">
+									<span ng-switch="col.type">
+										<span ng-switch-when="C">${{col.data}}</span>
+										<span ng-switch-when="P">{{col.data}}%</span>
+										<span ng-switch-when="D">{{col.data}}</span>
+										<span ng-switch-when="F">{{col.data}}</span>
+										<span ng-switch-default>{{col.data}}</span>
+									</span>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
-<div>
-	<button ng-click="save()">Save</button>
-	<button ng-click="cancel()">Clear</button>
-	<span ng-show="saved">Successfully saved....</span>
+	<div>
+		<button ng-click="save()">Save</button>
+		<button ng-click="cancel()">Clear</button>
+		<span ng-show="saved">Successfully saved....</span>
+	</div>
 </div>

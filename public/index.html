@@ -30,6 +30,7 @@
 		<script src="/javascripts/watch/watch.js"></script>
 		<script src="/javascripts/aewatchlist/aewatchlist.js"></script>
 		<script src="/javascripts/common/errorMessage.js"></script>
+		<script src="/javascripts/common/userInfo.js"></script>
 		<script src="/javascripts/test.js"></script>
     <script src="/javascripts/route.js"></script>
 		
@@ -45,8 +46,30 @@
         
 
 </head>
-<body >
-    <div class="container-fluid">
+<body layout="column">
+		<div class="header" layout="column">
+				<div flex="auto" >
+						<div class="title" >
+								<span>Sift</span>
+						</div>
+				</div>
+				<div flex="grow" layout="column" layout-align="end" class="mainmenu" >
+						<div layout="row" >
+								<ul flex="auto" ng-controller='menuCtrl'>
+										<li ng-class="selectedClass('/d')"><a href='#/d'>Dashboard</a></li>
+										<li ng-class="selectedClass('/p')" ><a href='#/p'>My Portfolios</a></li>
+										<li ng-class="selectedClass('/ae')"><a href='#/ae'>Create New Portfolio</a></li>
+										{{selectedPath}}
+								</ul>
+								<div flex="20" class="userInfo">
+										<user-info></user-info>
+								</div>
+						</div>
+						
+				</div>
+		</div>
+		
+    <div class="container-fluid view">
         <div ng-view></div>
     </div>
         

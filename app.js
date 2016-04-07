@@ -4,20 +4,23 @@
  */
 
 var express = require('express');
+var lessMiddleware = require('less-middleware');
+var mongoose = require('mongoose')
+var http = require('http');
+var path = require('path');
+
+
 var routes = require('./routes');
 var user = require('./routes/user');
 var watcher = require('./routes/watcher');
 var createTemplate = require('./routes/createTemplate');
 var enums = require('./routes/Enums');
-
-
 var downloadStmts = require('./routes/downloadStatements');
 var dbView = require('./routes/dbview');
-var mongoose = require('mongoose')
+
+
 mongoose.set('debug',true)
 
-var http = require('http');
-var path = require('path');
 
 var app = express();
 
@@ -41,6 +44,20 @@ app.get('/', function(req, res){
     res.redirect("/index.html")
     }
   );
+
+
+app.configure(function(){
+  //other configuration here...
+  app.use(lessMiddleware({
+    src      : __dirname + "/public/stylesheets",
+    dest     : __dirname + "/public/stylesheets",
+    debug:true,
+    force:true,
+    compress : false
+  }));
+  app.use(express.static(__dirname + '/public/stylesheets'));
+});
+
 
 mongoose.connect(enums.dbconnectURL);
 
